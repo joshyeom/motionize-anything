@@ -1,0 +1,16 @@
+{
+  "name": "motionize-anything",
+  "owner": {
+    "name": "joshyeom"
+  },
+  "metadata": {
+    "description": "motionize-anything 플러그인 로컬 마켓플레이스"
+  },
+  "plugins": [
+    {
+      "name": "motionize-anything",
+      "source": "./",
+      "description": "제품 사용법과 개념 설명을 화면 녹화 없이 HTML 모션으로 만든다."
+    }
+  ]
+}
