@@ -90,7 +90,7 @@
   const bar = (root, o) => box(root, { h: 20, ...o, bg: o.color || C.sub, radius: (o.h || 20) / 2 });
   const label = (root, o) => box(root, { font: 'sans', size: 28, weight: 500, color: C.sub, ...o });
   const count = (root, o) => box(root, { size: 72, weight: 800, color: C.blue, ...o, font: 'sans', num: true });
-  const pr = (root, o) => box(root, { text: 'PR', size: 34, weight: 700, ...o, font: 'sans', bg: C.blue, color: C.card, radius: 12, align: 'center' });
+  const chip = (root, o) => box(root, { text: '', size: 34, weight: 700, ...o, font: 'sans', bg: C.blue, color: C.card, radius: 12, align: 'center' });
   // 태그: 폭은 글에 맞춘다(o.w 를 쓰지 않음). tone 'blue' = 파랑 글 · 파랑 2px, 'gray' = 회색 글 · 선 1px. bg 기본 흰색
   // o.right(무대 x)를 주면 x 대신 오른쪽 끝을 그 x 에 맞춘다(root 가 무대 전체 1920 폭일 때)
   function tag(root, o) {
@@ -589,14 +589,14 @@
 
   // 프로그램 박스 tone: bg(배경) edge(테두리 색) dash(점선) color(제목) subColor(작은 글)
   const PROG_TONES = {
-    main: { bg: W.white, edge: W.text, color: W.text, subColor: W.subtle },
+    dark: { bg: W.white, edge: W.text, color: W.text, subColor: W.subtle },
     side: { bg: W.blue50, edge: W.blue, color: W.text, subColor: W.subtle },
     plain: { bg: W.white, edge: W.strong, color: W.text, subColor: W.subtle },
     off: { bg: W.muted, edge: W.n300, dash: true, color: W.subtle, subColor: W.subtle },
   };
   // 프로그램 박스: 모서리 20, 테두리 3px, 제목 34px 700 과 작은 글 24px 500 을 박스 가운데에. el.t = 제목 span, el.st = 작은 글 span(없으면 null)
   // el.setTone(tone) 은 값이 바뀔 때만 스타일을 바꾸므로 render 에서 매 프레임 불러도 된다
-  function progBox(root, { x, y, w, h, title, sub, tone = 'main' }) {
+  function progBox(root, { x, y, w, h, title, sub, tone = 'dark' }) {
     const el = box(root, { x, y, w, h });
     el.style.lineHeight = 'normal';
     el.body = document.createElement('div'); el.body.className = 'k-bd'; el.body.style.borderRadius = '20px';
@@ -757,7 +757,7 @@
   g.MotionKit = {
     C, F, SENT, FOCUS, MARK, DIM,
     clamp, seg, lerp, ioC, oC, ease, mixColor, prog, sub,
-    box, row, file, card, slot, panel, bar, label, count, pr, tag, badge, path, srccard, sentence, view, arrow, code,
+    box, row, file, card, slot, panel, bar, label, count, chip, tag, badge, path, srccard, sentence, view, arrow, code,
     show, pose, appear, center, ctrl, curve, moveAlong, borderTo, slide, swap, baselineOf, alignBaseline,
     textWidth, codeLines, outline, poly, banner, BANNER_TEXT,
     W, iconSvg, studs, brick, bannerBlock, miniBanner, buttonBlock, radioBlock, inputBlock, nameTag, plate, fitSentence, captions, TONES,

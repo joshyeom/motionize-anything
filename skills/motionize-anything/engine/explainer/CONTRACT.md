@@ -118,7 +118,7 @@ kit.captions(ctx, sent1, 's3_sentence1', sent2, 's3_sentence2', sent3, 's3_sente
 | `kit.fitSentence(el, max, min)` | 문장이 한 행(`max` px, 기본 1640)에 들어가도록 크기를 `min`(기본 32)까지 줄이고 가로 가운데에 놓음(measure 안에서만) | |
 | `kit.textWidth(text, o)`                                                                                                | 텍스트 폭(px, measure 안에서만)                                                         | `font size weight pre`                                                       |
 | `kit.view(root)`                                                                                                        | 구도 컨테이너(1920x1080). 장면 안 구도 교체에 씀                                        |                                                                              |
-| `kit.row`, `kit.file`, `kit.card`, `kit.slot`, `kit.count`, `kit.tag`, `kit.badge`, `kit.path`, `kit.pr`, `kit.srccard` | 이전 시안에서 쓴 카드와 태그(이 시안은 쓰지 않음)                                       | `kit.js` 주석                                                                |
+| `kit.row`, `kit.file`, `kit.card`, `kit.slot`, `kit.count`, `kit.tag`, `kit.badge`, `kit.path`, `kit.chip`, `kit.srccard` | 이전 시안에서 쓴 카드와 태그(이 시안은 쓰지 않음)                                       | `kit.js` 주석                                                                |
 
 ### 선과 코드
 
@@ -157,13 +157,13 @@ kit.captions(ctx, sent1, 's3_sentence1', sent2, 's3_sentence2', sent3, 's3_sente
 
 | 함수                      | 모양                                                                                                                                                                                                                        | 주요 인자(기본값)                                        |
 | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `kit.progBox(root, o)`    | 모서리 20, 테두리 3px 프로그램 박스의 가운데에 제목 34px 700(`el.t`)과 작은 글 24px 500(`el.st`, 없으면 null)을 둠, `el.setTone(tone)` 은 값이 바뀔 때만 스타일을 바꿔 render 에서 매 프레임 불러도 됨(지금 값은 `el.tone`) | `x y w h title sub tone('main'\|'side'\|'plain'\|'off')` |
+| `kit.progBox(root, o)`    | 모서리 20, 테두리 3px 프로그램 박스의 가운데에 제목 34px 700(`el.t`)과 작은 글 24px 500(`el.st`, 없으면 null)을 둠, `el.setTone(tone)` 은 값이 바뀔 때만 스타일을 바꿔 render 에서 매 프레임 불러도 됨(지금 값은 `el.tone`) | `x y w h title sub tone('dark'\|'side'\|'plain'\|'off')` |
 | `kit.sidecarBox(root, o)` | `progBox` 뒤에 연결 막대 2개(`el.links`, 높이의 30%와 70% 자리, 박스 밖 28, 두께 8)와 바퀴 1개(`el.wheel`, 지름 44, 박스 아래로 22 나옴)를 그림(`el._b` 는 박스 본체 기준)                                                  | `progBox` 인자, `tone('side')`                           |
 | `kit.chunkCard(root, o)`  | 글자 없는 조각 카드(흰 배경, 모서리 10, 테두리 2px, 위쪽 색 띠 14 `el.band` 는 blue 파랑과 amber 노랑, 회색 막대 2개)                                                                                                        | `x y w(132) h(88) kind('blue'\|'amber')`                  |
 | `kit.docStack(root, o)`   | 종이 3장(`el.papers`, 12px 씩 오른쪽 위로 어긋남)이 겹친 문서 묶음, 맨 앞 종이에 색 띠와 막대 5개, 제목 28px 700(`el.t`)과 작은 글 22px 회색(`el.st`)은 묶음 아래 가운데(아래로 약 90px 차지, `el._b` 는 종이 부분 기준)    | `x y w(220) h(270) title sub kind('blue')`                |
 | `kit.packet(root, o)`     | 요청과 응답을 나타내는 원(흰 테두리 4px), 만들 때는 숨어 있고 `kit.moveAlong`, `kit.show` 로 보임                                                                                                                           | `x(0) y(0) size(26) color(W.blue)`                       |
 
-- progBox tone: `main` 흰 배경과 `W.text` 테두리, `side` `W.blue50` 배경과 `W.blue` 테두리, `plain` 흰 배경과 `W.strong` 테두리, `off` `W.muted` 배경과 `W.n300` 점선, 글자 `W.subtle`(응답 없음 상태).
+- progBox tone: `dark` 흰 배경과 `W.text` 테두리, `side` `W.blue50` 배경과 `W.blue` 테두리, `plain` 흰 배경과 `W.strong` 테두리, `off` `W.muted` 배경과 `W.n300` 점선, 글자 `W.subtle`(응답 없음 상태).
 - sidecarBox 의 막대는 tone 의 테두리 색, 바퀴는 `W.text`(off 는 `W.n300`)입니다.
 
 ### 그림 카드 (이미지 생성 도구로 만든 그림)
