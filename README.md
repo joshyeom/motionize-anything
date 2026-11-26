@@ -13,6 +13,7 @@
 - 기본 보기는 클릭으로 넘기는 발표 모드입니다. 읽는 멈춤마다 멈춥니다.
 - `?export=1` 주소로 60fps mp4(1080p와 1440p)를 내보냅니다.
 - 기준 프레임을 저장해 두고 고친 뒤 픽셀 단위로 비교합니다.
+- 모든 화면 요소는 daisyUI 5 컴포넌트로 그립니다. 색은 `ui.css` 의 daisyUI 테마 하나(`data-theme="motionize"`)가 정합니다. 직접 만든 CSS 는 없고 `index.html` 에는 위치와 크기 같은 배치용 값만 있습니다.
 
 ## 설치
 
@@ -31,8 +32,8 @@ skills/motionize-anything/
   SKILL.md             스킬 본문
   reference/           사용법, 캡처, 엔진, 내보내기, 확인, PR 미리보기, 설명 모션 문서
   scripts/             PR 미리보기 업로드 스크립트
-  engine/usage/        사용법 모션 시작 틀
-  engine/explainer/    설명 모션 시작 틀(ui.css 와 scenes/kit.js 포함)
+  engine/usage/        사용법 모션 시작 틀(daisyUI 테마 ui.css 포함)
+  engine/explainer/    설명 모션 시작 틀(daisyUI 테마 ui.css 와 scenes/kit.js 포함)
   examples/usage-demo/ 완성 예시(가짜 메모 앱)
 ```
 
@@ -65,6 +66,7 @@ npm i playwright@1.58.2
 ## 필요한 도구
 
 - Node.js 와 npm (Playwright 용)
+- 네트워크 (두 모션 모두 daisyUI 5.8.2 CSS 를 jsdelivr CDN 에서 불러옵니다. 확인 도구와 mp4 내보내기도 같습니다)
 - ffmpeg (mp4 내보내기용)
 - Python 3 와 Pillow, numpy (기준 프레임 비교용)
 - Aside 브라우저 CLI (화면 캡처와 PR 미리보기 업로드용, 선택)

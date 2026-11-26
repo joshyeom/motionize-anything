@@ -133,25 +133,25 @@
     const T = sc.tgt;
     p.innerHTML = `<div style="position:absolute;left:0;top:0;width:${PW}px;height:${PH}px;${bg}background-position:${-sc.ox}px ${-sc.oy}px"></div>
       <div class="glow" style="position:absolute;left:${T.x}px;top:${T.y}px;width:${T.w}px;height:${T.h}px;border-radius:${sc.r}px"></div>
-      <div class="cover" style="position:absolute;left:${T.x}px;top:${T.y}px;width:${T.w}px;height:${T.h}px;background:#fff;border-radius:${sc.r}px"></div>
+      <div class="cover" style="position:absolute;left:${T.x}px;top:${T.y}px;width:${T.w}px;height:${T.h}px;background:var(--color-base-100);border-radius:${sc.r}px"></div>
       <div class="grp2" style="position:absolute;left:${T.x}px;top:${T.y}px;width:${T.w}px;height:${T.h}px;border-radius:${sc.r}px;overflow:hidden">
         <div style="position:absolute;inset:0;${bg}background-position:${-(sc.ox + T.x)}px ${-(sc.oy + T.y)}px"></div>
-        <div class="hover" style="position:absolute;inset:0;mix-blend-mode:${sc.dark ? 'screen' : 'multiply'};background:${sc.dark ? 'rgb(22,22,22)' : 'rgb(250,251,252.5)'}"></div>
-        <div class="press" style="position:absolute;inset:0;mix-blend-mode:screen;background:rgb(44,44,44)"></div>
-        <div class="ink" style="position:absolute;border-radius:50%;background:${sc.dark ? 'rgba(255,255,255,.25)' : 'rgba(49,130,243,.14)'}"></div>
+        <div class="hover" style="position:absolute;inset:0;mix-blend-mode:${sc.dark ? 'screen' : 'multiply'};background:${sc.dark ? 'var(--color-base-content)' : 'var(--color-base-200)'}"></div>
+        <div class="press" style="position:absolute;inset:0;mix-blend-mode:screen;background:var(--color-base-content)"></div>
+        <div class="ink" style="position:absolute;border-radius:50%;background:${sc.dark ? 'color-mix(in oklab, var(--color-base-100) 25%, transparent)' : 'color-mix(in oklab, var(--color-click-blue) 14%, transparent)'}"></div>
       </div>`;
     const svg = mk('svg', { width: PW, height: PH, viewBox: `0 0 ${PW} ${PH}` }, p);
     svg.style.cssText = 'position:absolute;left:0;top:0;overflow:visible;pointer-events:none';
-    const disc = document.createElement('div'); disc.style.cssText = 'position:absolute;border-radius:50%;background:rgba(237,255,0,.35)'; p.appendChild(disc);
+    const disc = document.createElement('div'); disc.style.cssText = 'position:absolute;border-radius:50%;background:color-mix(in oklab, var(--color-click-yellow) 35%, transparent)'; p.appendChild(disc);
     const cur = mk('svg', { viewBox: '0 0 15 22', width: 30, height: 44 }, p);
-    cur.style.cssText = 'position:absolute;left:0;top:0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.28));transform-origin:2px 2px;overflow:visible';
-    mk('path', { d: 'M1 1 L1 17.6 L5.1 13.7 L7.9 20.2 L10.7 19 L7.9 12.7 L13.5 12.7 Z', fill: '#000', stroke: '#fff', 'stroke-width': 1, 'stroke-linejoin': 'round' }, cur);
+    cur.style.cssText = 'position:absolute;left:0;top:0;transform-origin:2px 2px;overflow:visible';
+    mk('path', { d: 'M1 1 L1 17.6 L5.1 13.7 L7.9 20.2 L10.7 19 L7.9 12.7 L13.5 12.7 Z', fill: 'var(--color-primary)', stroke: 'var(--color-primary-content)', 'stroke-width': 1, 'stroke-linejoin': 'round' }, cur);
     const q = s => p.querySelector(s);
     const o = { v: vid, sc, el: { cover: q('.cover'), grp: q('.grp2'), hover: q('.hover'), press: q('.press'), ink: q('.ink'), glow: q('.glow'), disc, cur } };
-    const blue = '#3182f3';
-    if (vid === 'A') { o.rect = mk('rect', { fill: 'none', stroke: blue, 'stroke-width': 3, rx: 14 }, svg); o.ringA = mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 3 }, svg); o.ringB = mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 2 }, svg); o.drops = DROPS_A.map(() => mk('circle', { fill: blue }, svg)); o.core = mk('circle', { fill: '#EDFF00', stroke: blue, 'stroke-width': 2 }, svg); }
+    const blue = 'var(--color-click-blue)';
+    if (vid === 'A') { o.rect = mk('rect', { fill: 'none', stroke: blue, 'stroke-width': 3, rx: 14 }, svg); o.ringA = mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 3 }, svg); o.ringB = mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 2 }, svg); o.drops = DROPS_A.map(() => mk('circle', { fill: blue }, svg)); o.core = mk('circle', { fill: 'var(--color-click-yellow)', stroke: blue, 'stroke-width': 2 }, svg); }
     if (vid === 'C') { o.rings = [0, 1, 2].map(() => mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 1.6 }, svg)); o.drop = mk('circle', { fill: blue }, svg); }
-    if (vid === 'D') { o.ring = mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 2 }, svg); o.drops = DROPS_D.map(() => mk('circle', { fill: blue }, svg)); o.core = mk('circle', { fill: '#EDFF00', stroke: blue, 'stroke-width': 1.5 }, svg); }
+    if (vid === 'D') { o.ring = mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 2 }, svg); o.drops = DROPS_D.map(() => mk('circle', { fill: blue }, svg)); o.core = mk('circle', { fill: 'var(--color-click-yellow)', stroke: blue, 'stroke-width': 1.5 }, svg); }
     if (vid === 'E') { o.ring = mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 1.5 }, svg); }
     return o;
   }
@@ -214,7 +214,7 @@
       const kk = d < 0 ? 0 : d < P ? d / P : 1 - ioC(seg(d, P, P + Rl));
       show(el.cover, kk > 0 ? 1 : 0); el.grp.style.transform = `scale(${1 - 0.03 * kk})`;
       const gg = d < 0 ? 0 : d < Gi ? d / Gi : 1 - ioC(seg(d, Gi, Gi + Go));
-      show(el.glow, gg); el.glow.style.boxShadow = `0 0 22px 6px rgba(49,130,243,${0.45 * gg})`;
+      show(el.glow, gg); el.glow.style.boxShadow = `0 0 22px 6px color-mix(in oklab, var(--color-click-blue) ${45 * gg}%, transparent)`;
     }
   }
   const tc0 = tl => tl.tc;
@@ -225,14 +225,14 @@
   // ctx = { x, y: 누른 점, box: {x,y,w,h,r} 대상(무대 px), dark, touch, pointer: [x,y] 커서 끝 }
   // F 의 "대상 눌림(0.97배)" 은 합성 화면의 일부를 키울 수 없어 빛만 그린다.
   function buildOverlay(svg, layer, vid) {
-    const o = { v: vid, els: [] }, blue = '#3182f3';
+    const o = { v: vid, els: [] }, blue = 'var(--color-click-blue)';
     const g0 = mk('g', {}, svg); o.g = g0;
     const div = css => { const e = document.createElement('div'); e.style.cssText = 'position:absolute;' + css; layer.appendChild(e); o.els.push(e); return e; };
-    if (vid === 'A') { o.ringA = mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 3 }, g0); o.ringB = mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 2 }, g0); o.drops = DROPS_A.map(() => mk('circle', { fill: blue }, g0)); o.core = mk('circle', { fill: '#EDFF00', stroke: blue, 'stroke-width': 2 }, g0); }
+    if (vid === 'A') { o.ringA = mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 3 }, g0); o.ringB = mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 2 }, g0); o.drops = DROPS_A.map(() => mk('circle', { fill: blue }, g0)); o.core = mk('circle', { fill: 'var(--color-click-yellow)', stroke: blue, 'stroke-width': 2 }, g0); }
     if (vid === 'B') { o.clip = div('overflow:hidden'); o.ink = document.createElement('div'); o.ink.style.cssText = 'position:absolute;border-radius:50%'; o.clip.appendChild(o.ink); }
     if (vid === 'C') { o.rings = [0, 1, 2].map(() => mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 1.6 }, g0)); o.drop = mk('circle', { fill: blue }, g0); }
-    if (vid === 'D') { o.ring = mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 2 }, g0); o.drops = DROPS_D.map(() => mk('circle', { fill: blue }, g0)); o.core = mk('circle', { fill: '#EDFF00', stroke: blue, 'stroke-width': 1.5 }, g0); }
-    if (vid === 'E') { o.ring = mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 1.5 }, g0); o.disc = div('border-radius:50%;background:rgba(237,255,0,.35)'); }
+    if (vid === 'D') { o.ring = mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 2 }, g0); o.drops = DROPS_D.map(() => mk('circle', { fill: blue }, g0)); o.core = mk('circle', { fill: 'var(--color-click-yellow)', stroke: blue, 'stroke-width': 1.5 }, g0); }
+    if (vid === 'E') { o.ring = mk('circle', { fill: 'none', stroke: blue, 'stroke-width': 1.5 }, g0); o.disc = div('border-radius:50%;background:color-mix(in oklab, var(--color-click-yellow) 35%, transparent)'); }
     if (vid === 'F') { o.glow = div(''); }
     return o;
   }
@@ -255,7 +255,7 @@
       Object.assign(o.clip.style, { left: B.x + 'px', top: B.y + 'px', width: B.w + 'px', height: B.h + 'px', borderRadius: (B.r || 0) + 'px' });
       const lx = cx - B.x, ly = cy - B.y, R = Math.max(...[[0, 0], [B.w, 0], [0, B.h], [B.w, B.h]].map(([x, y]) => Math.hypot(x - lx, y - ly)));
       const ik = w(p, 'ink'), fd = w(p, 'inkFade'), r = R * oC(seg(d, ik[0], ik[1])), a = d < ik[0] ? 0 : 1 - ioC(seg(d, fd[0], fd[1]));
-      show(o.clip, a); Object.assign(o.ink.style, { left: lx - r + 'px', top: ly - r + 'px', width: 2 * r + 'px', height: 2 * r + 'px', background: ctx.dark ? 'rgba(255,255,255,.25)' : 'rgba(49,130,243,.14)' });
+      show(o.clip, a); Object.assign(o.ink.style, { left: lx - r + 'px', top: ly - r + 'px', width: 2 * r + 'px', height: 2 * r + 'px', background: ctx.dark ? 'color-mix(in oklab, var(--color-base-100) 25%, transparent)' : 'color-mix(in oklab, var(--color-click-blue) 14%, transparent)' });
     }
     if (o.v === 'C') {
       const D = p.drop.dur, dp = seg(d, 0, D), over2 = dp < 1 ? Math.sin(dp * Math.PI) * 0.15 : 0;
@@ -279,7 +279,7 @@
     }
     if (o.v === 'F') {
       const Gi = p.glowIn.dur, Go = p.glowOut.dur, gg = d < 0 ? 0 : d < Gi ? d / Gi : 1 - ioC(seg(d, Gi, Gi + Go));
-      show(o.glow, gg); Object.assign(o.glow.style, { left: B.x + 'px', top: B.y + 'px', width: B.w + 'px', height: B.h + 'px', borderRadius: (B.r || 0) + 'px', boxShadow: `0 0 22px 6px rgba(49,130,243,${0.45 * gg})` });
+      show(o.glow, gg); Object.assign(o.glow.style, { left: B.x + 'px', top: B.y + 'px', width: B.w + 'px', height: B.h + 'px', borderRadius: (B.r || 0) + 'px', boxShadow: `0 0 22px 6px color-mix(in oklab, var(--color-click-blue) ${45 * gg}%, transparent)` });
     }
   }
   // 커서 누름 크기 (0.88배)

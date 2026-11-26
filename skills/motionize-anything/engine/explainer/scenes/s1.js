@@ -1,5 +1,5 @@
-// 장면 1 블록 조합: 첫 컷의 초점은 가운데 모인 블록 3개(파랑 채움), 둘째 컷은 블록이 사라지고 배너 하나가 초점(파랑 테두리와 이름표), 셋째 컷은 같은 배너의 아이콘과 문구가 바뀐 노랑 배너가 초점이다.
-// 직접 그린 그림: 블록(kit.brick). ui.css 로 그린 것: 배너(kit.banner). 화면 글은 모두 TEXT 에 있다.
+// 장면 1 블록 조합: 첫 컷의 초점은 가운데 모인 블록 3개(초점 파랑), 둘째 컷은 블록이 사라지고 배너 하나가 초점(파랑 테두리와 이름표), 셋째 컷은 같은 배너의 아이콘과 문구가 바뀐 노랑 배너가 초점이다.
+// 모든 그림은 daisyUI 로 그린다: 블록(kit.brick = alert 와 돌기 badge), 테두리 채움(kit.tile 의 초점 색), 배너(kit.banner = alert), 이름표(kit.nameTag = badge). 화면 글은 모두 TEXT 에 있다.
 (function () {
   const TEXT = {
     sentence1: '박스, 아이콘, 텍스트 블록을 끼워 배너 하나를 만듭니다',
@@ -10,26 +10,28 @@
   const BW = 380, BH = 220, GAP = 40, Y = 600;
   const X0 = 960 - (3 * BW + 2 * GAP) / 2;   // 모인 뒤 첫 블록 왼쪽 x
   const FROM = [-420, 0, 420];                // 처음 흩어진 위치(모인 자리에서 가로로 벗어난 거리)
-  const BAN = { cx: 960, w: 900, s: 3, h: 147 }, PAD = 20;
+  const BAN = { cx: 960, w: 900, s: 3 }, PAD = 20;
   let sent1, sent2, sent3, bricks = [], banA, banB, frameA, frameB, tag, ready = false;
 
   MotionScenes.register(1, {
     build(root, kit) {
-      const B = kit.FOCUS.blue, Y2 = kit.FOCUS.yellow, y = Y + (BH - BAN.h) / 2;
-      [TEXT.b1, TEXT.b2, TEXT.b3].forEach((t, i) => bricks.push(kit.brick(root, { x: X0 + i * (BW + GAP), y: Y, w: BW, h: BH, color: B.bg, edge: B.edge, text: t, size: 44, weight: 800, textColor: B.ink })));
-      // 배너 둘(파랑과 노랑)을 같은 자리에 겹쳐 두고 셋째 컷에서 바꾼다. 테두리는 배너보다 먼저 만들어 아래에 깐다
-      const fr = (c) => kit.box(root, { x: BAN.cx - BAN.w / 2 - PAD, y: y - PAD, w: BAN.w + 2 * PAD, h: BAN.h + 2 * PAD, radius: 28, bg: c.bg, border: '6px solid ' + c.edge });
-      frameA = fr(B); frameB = fr(Y2);
-      banA = kit.banner(root, { cx: BAN.cx, y, w: BAN.w, s: BAN.s, tone: 'info', text: TEXT.banner });
-      banB = kit.banner(root, { cx: BAN.cx, y, w: BAN.w, s: BAN.s, tone: 'warning', text: TEXT.banner2 });
-      tag = kit.nameTag(root, { text: TEXT.tag, size: 36, h: 56, anchor: 'l' });
+      [TEXT.b1, TEXT.b2, TEXT.b3].forEach((t, i) => bricks.push(kit.brick(root, { x: X0 + i * (BW + GAP), y: Y, w: BW, h: BH, tone: 'blue', text: t, size: 44 })));
+      // 배너 둘(파랑과 노랑)을 같은 자리에 겹쳐 두고 셋째 컷에서 바꾼다. 테두리와 채움(초점 색)은 배너보다 먼저 만들어 아래에 깐다
+      const fr = tn => kit.tile(root, { x: 0, y: 0, w: 100, h: 100, s: 5, tone: tn });
+      frameA = fr('blue'); frameB = fr('yellow');
+      banA = kit.banner(root, { cx: BAN.cx, y: 0, w: BAN.w, s: BAN.s, tone: 'info', text: TEXT.banner });
+      banB = kit.banner(root, { cx: BAN.cx, y: 0, w: BAN.w, s: BAN.s, tone: 'warning', text: TEXT.banner2 });
+      tag = kit.nameTag(root, { text: TEXT.tag, size: 36, anchor: 'l' });
       sent1 = kit.sentence(root, TEXT.sentence1, 1, [['끼워 배너 하나를 만듭니다', 'blue']]);
       sent2 = kit.sentence(root, TEXT.sentence2, 2, [['컴포넌트', 'blue']]);
       sent3 = kit.sentence(root, TEXT.sentence3, 3, [['같은 틀로 다른 배너', 'yellow']]);
     },
     measure(kit) {
       banA.fit(); banB.fit();
-      tag.put(BAN.cx - BAN.w / 2 - PAD, Y + (BH - BAN.h) / 2 - PAD - 70);   // 테두리 왼쪽 위 바로 위
+      const h = banA._b.h, y = Y + (BH - h) / 2;
+      [banA, banB].forEach(b => b.moveTo(b._b.x, y));
+      [frameA, frameB].forEach(f => { f.moveTo(BAN.cx - BAN.w / 2 - PAD, y - PAD); f.resize((BAN.w + 2 * PAD) / f.s, (h + 2 * PAD) / f.s); });
+      tag.put(BAN.cx - BAN.w / 2 - PAD, y - PAD - 70);   // 테두리 왼쪽 위 바로 위
       kit.fitSentence(sent1); kit.fitSentence(sent2); kit.fitSentence(sent3);
       ready = true;
     },

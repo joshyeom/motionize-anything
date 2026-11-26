@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-theme="motionize">
 <head>
 <meta charset="utf-8" />
 <title>메모 앱 사용법 모션 예시</title>
@@ -7,189 +7,141 @@
   [공용]     = 사용법 모션 엔진 그대로 (engine/usage/ 에서 복사)
   [기능마다] = 가짜 메모 앱(HTML 로 그림, 1280×820 CSS)을 1.0배 창으로, 장면 3개. 클릭, 입력, 화면 전환, 문제 박스, 터미널 단계를 모두 쓴다.
 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.8.2/daisyui.css" />
+<link rel="stylesheet" href="ui.css" />
 <style>
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
-/* [공용] 무대, 보기 방식 */
-html,body{margin:0;background:#ddd;font-family:Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;}
-body.box{background:#fff;}
-body.export{background:#f2f4f6;}
+/* 모든 화면 요소는 daisyUI 컴포넌트 클래스로 그린다. 색, 글꼴, 모서리는 ui.css 의 테마(data-theme="motionize")가 정한다.
+   이 <style> 에는 배치용 규칙만 있다(무대 좌표, 보기 방식, 발표 모드의 자리) */
+/* [공용] 배치용: 무대, 보기 방식 */
+html,body{margin:0;}
 #wrap{position:relative;margin:20px auto 0;overflow:hidden;}
-body.box #wrap{border-radius:32px;margin-top:40px;}
+body.box #wrap{margin-top:40px;}
 body.export #wrap{margin:0;}
 body.export #ui{display:none;}
-#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;background:#f2f4f6;overflow:hidden;}
-#stage div{position:absolute;}
-#stage .capBig div,#stage .chip div,#stage .fl div,#stage .fl span{position:static;}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;}
+#stage div:not(.kw *){position:absolute;}   /* 무대 안 div 는 좌표로 놓는다. daisyUI 마크업(.kw) 안쪽은 제외 */
 .img{background-repeat:no-repeat;}
-.shadow{box-shadow:0 12px 40px rgba(0,0,0,.08);}
-/* [공용] 단계 문구: 칩(PC). 번호 칸 파랑 rgb(31,102,241) */
-.chip{left:960px;top:17px;height:56px;display:flex;align-items:center;gap:12px;padding:0 28px 0 8px;background:#fff;border-radius:28px;white-space:nowrap;box-shadow:0 12px 40px rgba(0,0,0,.08);}
-.chip b{width:40px;height:40px;border-radius:20px;background:rgb(31,102,241);color:#fff;font-size:19px;font-weight:800;display:flex;align-items:center;justify-content:center;}
-.chip .role{font-size:27px;font-weight:600;color:#666;}
-.chip .role:empty{display:none;}
-.chip .ttl{font-size:29px;font-weight:800;color:#000;letter-spacing:-.02em;}
-/* [공용] 클릭 효과, 커서 */
+/* [공용] 배치용: 클릭 효과, 커서, 조작줄 */
 #fx{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;}
-#cursor{position:absolute;left:0;top:0;width:30px;height:44px;overflow:visible;filter:drop-shadow(0 2px 3px rgba(0,0,0,.28));transform-origin:2px 2px;}
-.dot{width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:rgba(0,0,0,.28);box-shadow:0 0 0 2px #fff inset;}
-#ui{display:flex;align-items:center;gap:12px;margin:14px auto;font:13px/1 ui-monospace,Menlo,monospace;color:#000;}
+#cursor{position:absolute;left:0;top:0;width:30px;height:44px;overflow:visible;transform-origin:2px 2px;}
+.dot{width:44px;height:44px;margin:-22px 0 0 -22px;}
+#ui{display:flex;align-items:center;gap:12px;margin:14px auto;}
 #ui input{flex:1;}
-#ui button{font:inherit;padding:4px 10px;}
-[contenteditable]{outline:none;caret-color:#3182f3;}
 
 
-
-/* ======================= [기능마다] 화면 배치 ======================= */
-/* 장면 문장 자리: x 120, 위 문장 y 114 h 48 40px 700, 아래 문장 y 166 h 44 34px 600 */
-/* 장면 문장 자리(문서 설명 모션 kit.SENT 와 같음): x 120, 위 문장 y 114 h 48 40px 700, 아래 문장 y 166 h 44 34px 600 */
-.sent{left:120px;white-space:nowrap;font-family:"Pretendard Variable",Pretendard,-apple-system,sans-serif;color:rgb(25,31,40);-webkit-font-smoothing:antialiased;}
-.sent.l1{top:114px;height:48px;line-height:48px;font-size:40px;font-weight:700;}
-.sent.l2{top:166px;height:44px;line-height:44px;font-size:34px;font-weight:600;}
-
-/* 앱 창: 1280×820 CSS 를 1.0배, 가로 가운데, 문장 자리 아래 y 240~1060 */
-#win{left:320px;top:240px;width:1280px;height:820px;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 12px 40px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.04);}
-#app{left:0;top:0;width:1280px;height:820px;transform-origin:0 0;overflow:hidden;background:#fff;}
-.pt{font-family:"Pretendard Variable",Pretendard,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;color:rgb(26,31,39);}
-/* 가짜 화면(HTML 로 그림): 메모 앱 */
-#sidebar{left:0;top:0;width:220px;height:820px;background:#f6f7f9;border-right:1px solid #e6e8eb;}
-.sbTitle{left:28px;top:30px;font-size:22px;font-weight:800;}
-.sbItem{left:12px;width:196px;height:40px;border-radius:8px;font-size:15px;line-height:40px;padding-left:16px;box-sizing:border-box;color:#4e5968;font-weight:500;}
-.sbItem.on{background:#e8f0fe;color:#1f66f1;font-weight:700;}
-.mh{left:260px;top:24px;font-size:26px;font-weight:700;line-height:40px;white-space:nowrap;}
-.btn{border-radius:10px;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;box-sizing:border-box;}
-.btn.pri{background:#1f66f1;color:#fff;}
-.btn.sec{background:#f2f4f6;color:#4e5968;}
-.row{left:260px;width:960px;height:80px;border:1px solid #e6e8eb;border-radius:12px;box-sizing:border-box;background:#fff;}
-.row .rt{left:24px;top:15px;font-size:18px;font-weight:700;white-space:nowrap;}
-.row .rd{left:24px;top:46px;font-size:14px;color:#8b95a1;white-space:nowrap;}
-.lab{left:260px;font-size:14px;font-weight:600;color:#4e5968;}
-.box{border:1.5px solid #d5dae1;border-radius:10px;box-sizing:border-box;background:#fff;}
-#inTxt{left:278px;top:160px;height:52px;line-height:52px;font-size:18px;white-space:nowrap;}
-#inPh{left:278px;top:160px;height:52px;line-height:52px;font-size:18px;color:#8b95a1;white-space:nowrap;}
-#caret{top:174px;width:1.5px;height:24px;background:rgb(26,31,39);}
-/* 스낵바 */
-#snack{top:752px;height:44px;border-radius:12px;background:rgb(26,31,39);color:#fff;display:flex;align-items:center;gap:22px;padding:0 18px 0 16px;font-size:14px;font-weight:600;white-space:nowrap;box-sizing:border-box;}
-#snack .act{color:rgb(151,191,250);}
-/* 터미널 창: cc-best.png 의 창(x44~1504, y50~952)을 앱 창과 같은 폭으로(1280/1460 배) */
-#ccWin{left:320px;top:240px;width:1280px;height:790.79px;border-radius:20px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.08);}
-#cc{left:0;top:0;width:1460px;height:902px;transform-origin:0 0;overflow:hidden;background:rgb(0,43,54);}
-.term{font-family:Menlo,"SF Mono",monospace;font-size:30px;line-height:38px;white-space:pre;color:rgb(131,148,150);-webkit-font-smoothing:antialiased;}
-.term .b{font-weight:700;color:rgb(147,161,162);}
-.term .dim,.term.dim{color:rgb(60,98,107);}
-.term .red{color:rgb(107,51,60);}
-.term .gd{color:rgb(1,188,90);}
-.term .wd{color:rgb(255,255,255);}
-.term .blk{display:inline-block;width:18px;height:34px;background:rgb(128,147,150);vertical-align:-7px;}
-.term .sp{color:rgb(215,119,87);}
-/* 문제 박스(무대 px) */
-.issue{display:flex;align-items:center;gap:12px;padding:12px 22px 12px 12px;background:#fdf3e7;color:#b25e09;border:1.5px solid rgba(178,94,9,.3);border-radius:14px;font-family:"Pretendard Variable",Pretendard,sans-serif;font-size:24px;font-weight:700;letter-spacing:-.015em;white-space:nowrap;box-shadow:0 12px 32px rgba(0,0,0,.14);-webkit-font-smoothing:antialiased;}
-.issue b{background:#b25e09;color:#fff;font-size:18px;font-weight:800;padding:4px 10px;border-radius:8px;letter-spacing:0;}
-/* [기능마다] 발표 모드: 기본 보기 페이지(?box=1, ?export=1, ?embed=1 은 바꾸기 전 엔진 그대로). 무대 밖 조작 영역은 숨기고 DOM 은 남긴다 */
-html.deck,html.deck body{background:#f2f4f6;}
+/* ======================= [기능마다] 화면 배치(배치용) ======================= */
+/* 배치용: 앱 창, daisyUI mockup-window 1280×820, 가로 가운데, 문장 자리 아래 y 240~1060. 위쪽 48px 는 창 막대(점 3개)라서 앱 화면은 그 아래 1280×772 */
+#win{left:320px;top:240px;width:1280px;height:820px;}
+#app{left:0;top:48px;width:1280px;height:772px;transform-origin:0 0;overflow:hidden;}
+/* 배치용: 터미널 창, cc-best.png 의 창(x44~1504, y50~952)을 앱 창과 같은 폭으로(1280/1460 배). 그림 위 글은 daisyUI mockup-code 이고 글자 크기는 확대 배율(scale)로 정한다 */
+#ccWin{left:320px;top:240px;width:1280px;height:790.79px;overflow:hidden;}
+#cc{left:0;top:0;width:1460px;height:902px;transform-origin:0 0;overflow:hidden;}
+#ccTerm{left:0;top:-103px;width:679.4px;height:346.7px;transform-origin:0 0;transform:scale(2.1428);}
+#ccTerm>pre,#ccTerm>div{position:absolute;margin:0;padding:0;}
+#ccTerm>pre{width:auto;min-width:0;}
+#ccTerm>pre::before{content:none;}
+/* [기능마다] 배치용, 발표 모드: 기본 보기 페이지(?box=1, ?export=1, ?embed=1 은 바꾸기 전 엔진 그대로). 무대 밖 조작 영역은 숨기고 DOM 은 남긴다 */
 html.deck body{overflow:hidden;}
 html.deck #wrap{margin:0 auto;}
 html.deck #ui{display:none;}
-/* [기능마다] 발표 모드: 무대 안 조작 요소(기준 무대 좌표). 앱 창 양옆 빈 곳(폭 320) 아래 구석에 둔다 */
+/* [기능마다] 배치용, 발표 모드: 무대 안 조작 요소(기준 무대 좌표). 앱 창 양옆 빈 곳(폭 320) 아래 구석에 둔다 */
 html.deck #stage{cursor:pointer;user-select:none;-webkit-user-select:none;}
-html:not(.deck) #prev,html:not(.deck) #autoLbl,html:not(.deck) #stage #prog{display:none;}
-#prev{position:absolute;left:24px;bottom:28px;height:44px;padding:0 20px;box-sizing:border-box;border:0;border-radius:22px;background:#fff;display:flex;align-items:center;gap:8px;font:700 20px "Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;color:#333d4b;cursor:pointer;-webkit-appearance:none;appearance:none;}
-#prev:hover:not(:disabled){background:#e5e8eb;}
-#prev:disabled{opacity:.35;cursor:default;}
-#prev svg{flex:none;width:16px;height:16px;}
-#autoLbl{position:absolute;right:16px;bottom:28px;height:44px;display:flex;align-items:center;gap:10px;font:500 20px "Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;color:#6b7684;cursor:pointer;}
-#autoLbl input{margin:0;width:20px;height:20px;accent-color:rgb(31,102,241);cursor:pointer;}
-#stage #prog{right:16px;bottom:84px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;white-space:nowrap;-webkit-font-smoothing:antialiased;}
-#prog b{font-size:22px;font-weight:700;color:#333d4b;}
-#prog span{font-size:15px;font-weight:500;color:#6b7684;}
+html:not(.deck) #prevBox,html:not(.deck) #autoLbl,html:not(.deck) #progBox{display:none;}
+#prevBox{left:24px;bottom:28px;}
+#autoLbl{right:16px;bottom:28px;}
+#progBox{right:16px;bottom:84px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
 </style>
 </head>
 <body>
-<div id="wrap"><div id="stage">
-  <!-- [기능마다] 앱 창: 가짜 메모 앱(HTML 로 그림) -->
-  <div id="win">
-    <div id="app" class="pt">
-      <div id="sidebar">
-        <div class="sbTitle">메모장</div>
-        <div class="sbItem on" style="top:96px">모든 메모</div>
-        <div class="sbItem" style="top:140px">즐겨찾기</div>
-        <div class="sbItem" style="top:184px">휴지통</div>
+<div id="wrap" class="bg-base-200"><div id="stage" class="bg-base-200" style="--color-info:var(--color-usage-blue);--color-warning:var(--color-issue)">
+  <!-- [기능마다] 앱 창: 가짜 메모 앱(daisyUI 컴포넌트로 그림). 앱 화면 안은 .kw 라서 좌표는 style 의 position:absolute 로 정한다 -->
+  <div id="win" class="mockup-window bg-base-100">
+    <div id="app" class="kw">
+      <!-- 앱 화면은 daisyUI 기본 크기의 1.25배(zoom)로 읽히게 키운다. 안쪽 좌표는 확대 전 값이다(APP.s = 1.25) -->
+      <div id="appz" style="position:absolute;left:0;top:0;width:1024px;height:618px;zoom:1.25">
+        <ul class="menu bg-base-200" style="--menu-active-bg:var(--color-usage-blue-soft);--menu-active-fg:var(--color-usage-blue);position:absolute;left:0;top:0;width:176px;height:618px">
+          <li class="menu-title text-base-content"><b>메모장</b></li>
+          <li><a class="menu-active">모든 메모</a></li>
+          <li><a>즐겨찾기</a></li>
+          <li><a>휴지통</a></li>
+        </ul>
+        <div id="vList" style="position:absolute;left:176px;top:0;width:848px;height:618px">
+          <div class="navbar bg-base-100" style="position:absolute;left:0;top:0;width:848px;padding-inline:32px 48px"><div class="navbar-start"><b style="zoom:1.3">모든 메모</b></div><div class="navbar-end"><button id="btnNew" class="btn btn-info" type="button" tabindex="-1" style="width:112px">새 메모</button></div></div>
+          <div class="card card-border bg-base-100 border-base-300" style="position:absolute;left:32px;top:72px;width:768px">
+            <ul class="list">
+              <li id="rowNew" class="list-row"><div><div><b>주간 회의 준비</b></div><div><span class="label">11월 22일</span></div></div></li>
+              <li id="r0" class="list-row"><div><div><b>분기 계획 정리</b></div><div><span class="label">11월 18일</span></div></div></li>
+              <li id="r1" class="list-row"><div><div><b>장보기 목록</b></div><div><span class="label">11월 15일</span></div></div></li>
+              <li id="r2" class="list-row"><div><div><b>독서 메모</b></div><div><span class="label">11월 9일</span></div></div></li>
+            </ul>
+          </div>
+        </div>
+        <div id="vEdit" style="position:absolute;left:176px;top:0;width:848px;height:618px">
+          <div class="navbar bg-base-100" style="position:absolute;left:0;top:0;width:848px;padding-inline:32px 48px"><div class="navbar-start"><b style="zoom:1.3">새 메모</b></div><div class="navbar-end" style="gap:10px"><button class="btn btn-secondary" type="button" tabindex="-1" style="width:88px">취소</button><button id="btnSave" class="btn btn-info" type="button" tabindex="-1" style="width:96px">저장</button></div></div>
+          <div class="label" style="position:absolute;left:32px;top:84px">제목</div>
+          <div id="titleBox" class="input" style="position:absolute;left:32px;top:108px;width:576px;height:42px"><span id="inTxt"></span><span id="caret" class="text-info" style="visibility:hidden">|</span><span id="inPh" class="label">제목을 입력하세요</span></div>
+          <div class="label" style="position:absolute;left:32px;top:176px">내용</div>
+          <textarea class="textarea" placeholder="내용을 입력하세요" readonly tabindex="-1" style="position:absolute;left:32px;top:200px;width:768px;height:288px;resize:none"></textarea>
+        </div>
+        <div id="snack" class="alert text-primary-content" style="--alert-color:var(--color-usage-ink);position:absolute;top:556px;white-space:nowrap"><span id="snMsg">메모를 저장했어요</span><span id="snAct" class="link" style="color:var(--color-usage-blue-light)">보기</span></div>
+        <div id="veil" class="bg-base-100" style="position:absolute;left:0;top:0;width:1024px;height:618px"></div>
       </div>
-      <div id="vList" style="left:0;top:0;width:1280px;height:820px">
-        <div class="mh">모든 메모</div>
-        <div id="btnNew" class="btn pri" style="left:1080px;top:22px;width:140px;height:44px">새 메모</div>
-        <div id="rowNew" class="row" style="top:120px"><div class="rt">주간 회의 준비</div><div class="rd">11월 22일</div></div>
-        <div id="r0" class="row"><div class="rt">분기 계획 정리</div><div class="rd">11월 18일</div></div>
-        <div id="r1" class="row"><div class="rt">장보기 목록</div><div class="rd">11월 15일</div></div>
-        <div id="r2" class="row"><div class="rt">독서 메모</div><div class="rd">11월 9일</div></div>
-      </div>
-      <div id="vEdit" style="left:0;top:0;width:1280px;height:820px">
-        <div class="mh">새 메모</div>
-        <div class="btn sec" style="left:970px;top:22px;width:110px;height:44px">취소</div>
-        <div class="btn pri" style="left:1100px;top:22px;width:120px;height:44px">저장</div>
-        <div class="lab" style="top:126px">제목</div>
-        <div class="box" style="left:260px;top:160px;width:720px;height:52px"></div>
-        <div id="inFocus" style="left:258px;top:158px;width:724px;height:56px;border:2px solid rgb(72,128,238);border-radius:11px;box-sizing:border-box"></div>
-        <div id="inPh">제목을 입력하세요</div>
-        <div id="inTxt"></div>
-        <div id="caret"></div>
-        <div class="lab" style="top:244px">내용</div>
-        <div class="box" style="left:260px;top:278px;width:960px;height:360px"></div>
-        <div style="left:278px;top:296px;font-size:16px;color:#8b95a1">내용을 입력하세요</div>
-      </div>
-      <div id="snack" class="fl"><span id="snMsg">메모를 저장했어요</span><span id="snAct" class="act">보기</span></div>
-      <div id="veil" style="left:0;top:0;width:1280px;height:820px;background:#fff"></div>
     </div>
   </div>
-  <!-- [기능마다] 터미널 창 (Claude Code 그림 위에 글을 덮어 그림) -->
-  <div id="ccWin"><div id="cc">
+  <!-- [기능마다] 터미널 창 (Claude Code 그림 위에 글을 덮어 그림). 그림 위 덮개와 글은 daisyUI mockup-code 이고, 색은 그림의 색에 맞춘 테마 변수(--color-term-*)를 daisyUI 색 이름에 연결해 쓴다.
+       연결: neutral 바탕, neutral-content 글, base-content 굵은 글, secondary-content 흐린 글, secondary 구분선, base-300 입력 echo 줄 바탕, success 초록 점, warning 주황 별, error 빨강 브랜치 -->
+  <div id="ccWin" class="rounded-box"><div id="cc">
     <div id="ccImg" class="img" style="left:0;top:0;width:1460px;height:902px;background-image:url(pages/cc/cc-best@2x.png);background-size:1552px 992px;background-position:-44px -50px"></div>
-    <div id="ccTitle" style="left:540px;top:9px;width:380px;height:34px;background:rgb(245,242,245);display:flex;align-items:center;justify-content:center;font:700 28px/1 -apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color:rgb(75,72,75);-webkit-font-smoothing:antialiased">✳ Claude Code</div>
-    <div id="ccPath" class="term dim" style="left:205px;top:175px;width:420px;height:38px;background:rgb(0,43,54);padding-left:5px;box-sizing:border-box">~/memo-demo</div>
-    <div id="ccLow" style="left:2px;top:250px;width:1456px;height:640px;background:rgb(0,43,54)"></div>
-    <div id="ccBar0" style="left:0;top:250px;height:40px;background:rgb(54,55,54)"></div>
-    <div id="ccMsg0" class="term" style="left:11px;top:251px"></div>
-    <div id="ccR0" class="term" style="left:11px;top:327px"><span class="gd">●</span> <span class="b">Read</span>(notes/list.json)</div>
-    <div id="ccR1" class="term" style="left:11px;top:365px"><span class="gd">●</span> <span class="b">Update</span>(notes/list.json)</div>
-    <div id="ccSpin" class="term" style="left:11px;top:403px"><span class="sp">✻ Working…</span> <span class="dim">(esc to interrupt)</span></div>
-    <div id="ccSep1" style="left:10px;width:1441px;height:2px;background:rgb(60,91,103)"></div>
-    <div id="ccIn" class="term" style="left:11px"><span>&gt; </span><span id="ccTyped"></span><span class="blk"></span></div>
-    <div id="ccSep2" style="left:10px;width:1441px;height:2px;background:rgb(60,91,103)"></div>
-    <div id="ccFootL" class="term" style="left:47px"><span class="dim">memo-demo</span> <span class="red">(main)</span></div>
-    <div id="ccFootR" class="term dim" style="right:49px">○ /ide for Cursor</div>
+    <div id="ccTitle" class="badge badge-ghost" style="left:540px;top:9px;width:380px;height:34px;--color-base-200:var(--color-term-title-bg);--color-base-300:var(--color-term-title-bg);--color-base-content:var(--color-term-title-fg)"><span style="zoom:1.75"><b>✳ Claude Code</b></span></div>
+    <div id="ccPath" class="badge badge-ghost" style="left:205px;top:175px;width:420px;height:38px;justify-content:flex-start;--color-base-200:var(--color-term-bg);--color-base-300:var(--color-term-bg);--color-base-content:var(--color-term-dim)"><code style="zoom:2.14">~/memo-demo</code></div>
+    <div id="ccLow" style="left:2px;top:250px;width:1456px;height:640px;overflow:hidden">
+      <div id="ccTerm" class="mockup-code" style="--color-neutral:var(--color-term-bg);--color-neutral-content:var(--color-term-fg);--color-base-content:var(--color-term-bold);--color-secondary-content:var(--color-term-dim);--color-secondary:var(--color-term-line);--color-base-300:var(--color-term-bar);--color-success:var(--color-term-green);--color-warning:var(--color-term-orange);--color-error:var(--color-term-red)">
+        <pre id="ccMsg0" class="bg-base-300" style="left:-0.93px;top:48.53px;padding:0 8.40px 0 5.13px;line-height:18.67px;height:18.67px"><code></code></pre>
+        <pre id="ccR0" style="left:4.2px;top:84px"><code><span class="text-success">●</span> <b class="text-base-content">Read</b>(notes/list.json)</code></pre>
+        <pre id="ccR1" style="left:4.2px;top:101.73px"><code><span class="text-success">●</span> <b class="text-base-content">Update</b>(notes/list.json)</code></pre>
+        <pre id="ccSpin" style="left:4.2px;top:119.47px"><code><span class="text-warning">✻ Working…</span> <span class="text-secondary-content">(esc to interrupt)</span></code></pre>
+        <div id="ccSep1" class="bg-secondary" style="left:3.73px;width:672.47px;height:0.93px"></div>
+        <pre id="ccIn" style="left:4.2px"><code>&gt; <span id="ccTyped"></span><span class="bg-neutral-content" style="display:inline-block;width:.6em;height:1.13em;vertical-align:-.23em"></span></code></pre>
+        <div id="ccSep2" class="bg-secondary" style="left:3.73px;width:672.47px;height:0.93px"></div>
+        <pre id="ccFootL" style="left:21px"><code><span class="text-secondary-content">memo-demo</span> <span class="text-error">(main)</span></code></pre>
+        <pre id="ccFootR" class="text-secondary-content" style="right:21.93px"><code>○ /ide for Cursor</code></pre>
+      </div>
+    </div>
   </div></div>
   <!-- [공용] 효과 층 (순서 유지: 효과 → 문구 → 커서) -->
   <div id="fxDiv" style="inset:0;pointer-events:none"></div>
   <svg id="fx" width="1920" height="1080" viewBox="0 0 1920 1080"></svg>
-  <div id="curDisc" style="border-radius:50%;background:rgba(237,255,0,.35);display:none"></div>
+  <div id="curDisc" class="status status-warning" style="--color-warning:var(--color-click-yellow);display:none"></div>
   <!-- [기능마다] 문제 박스 (무대 px, 강조 선 위) -->
   <div id="issues" style="inset:0;pointer-events:none"></div>
   <!-- [공용 구조] 단계 문구 -->
   <div id="sents"></div>
-  <div id="cap1" class="chip"><b>1</b><span class="role"></span><span class="ttl">새 메모는 어떻게 만드나요</span></div>
-  <div id="cap2" class="chip"><b>2</b><span class="role"></span><span class="ttl">저장한 메모는 어디에 보이나요</span></div>
-  <div id="cap3" class="chip"><b>3</b><span class="role"></span><span class="ttl">정리는 누가 하나요</span></div>
+  <div id="cap1" class="chip" style="left:960px;top:17px"><span class="badge badge-lg border-base-300 bg-base-100" style="zoom:2;white-space:nowrap"><span class="badge badge-info num">1</span><span class="text-neutral role" hidden></span><b class="ttl">새 메모는 어떻게 만드나요</b></span></div>
+  <div id="cap2" class="chip" style="left:960px;top:17px"><span class="badge badge-lg border-base-300 bg-base-100" style="zoom:2;white-space:nowrap"><span class="badge badge-info num">2</span><span class="text-neutral role" hidden></span><b class="ttl">저장한 메모는 어디에 보이나요</b></span></div>
+  <div id="cap3" class="chip" style="left:960px;top:17px"><span class="badge badge-lg border-base-300 bg-base-100" style="zoom:2;white-space:nowrap"><span class="badge badge-info num">3</span><span class="text-neutral role" hidden></span><b class="ttl">정리는 누가 하나요</b></span></div>
   <div id="dots"></div>
-  <svg id="cursor" viewBox="0 0 15 22"><path d="M1 1 L1 17.6 L5.1 13.7 L7.9 20.2 L10.7 19 L7.9 12.7 L13.5 12.7 Z" fill="#000" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg>
-  <!-- [기능마다] 발표 모드: 이전 버튼, 진행 표시와 안내, 자동 전환 -->
-  <button type="button" id="prev"><svg viewBox="0 0 16 16" fill="none" stroke="#333d4b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="10,2.5 4.5,8 10,13.5"/></svg>이전</button>
-  <div id="prog"><b id="progN"></b><span>클릭하거나 → 키로 넘김</span></div>
-  <label id="autoLbl"><input type="checkbox" id="auto" /><span>자동 전환</span></label>
+  <svg id="cursor" class="text-primary" viewBox="0 0 15 22"><path d="M1 1 L1 17.6 L5.1 13.7 L7.9 20.2 L10.7 19 L7.9 12.7 L13.5 12.7 Z" fill="currentColor" stroke="var(--color-primary-content)" stroke-width="1" stroke-linejoin="round"/></svg>
+  <!-- 크기는 확대 배율(zoom)로 정한다. daisyUI 컴포넌트는 rem 크기가 정해져 있어서 무대에서 읽히게 키운다 -->
+  <div id="prevBox"><button type="button" id="prev" class="btn" style="--btn-color:var(--color-base-100);zoom:1.25"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="10,2.5 4.5,8 10,13.5"/></svg>이전</button></div>
+  <div id="progBox"><span style="zoom:1.5"><b id="progN"></b></span><span class="label" style="zoom:1.1">클릭하거나 → 키로 넘김</span></div>
+  <div id="autoLbl"><label class="label" style="zoom:1.5"><input type="checkbox" id="auto" class="checkbox checkbox-info checkbox-sm" /><span>자동 전환</span></label></div>
 
-<div id="ui"><button id="pp">재생/정지</button><input id="scrub" type="range" min="0" max="1000" step="1" value="0"><span id="tm">0.00 s</span></div>
-<script src="click-fx.js?v=4"></script>
+</div></div>
+<div id="ui"><button id="pp" class="btn btn-sm">재생/정지</button><input id="scrub" class="range range-xs" type="range" min="0" max="1000" step="1" value="0"><span id="tm" class="badge badge-ghost">0.00 s</span></div>
+<script src="click-fx.js?v=5"></script>
 <script src="motion-steps.js?v=1"></script>
 <script>
 
 // ======================= [기능마다] 데이터: 이 예시는 캡처 그림 없이 HTML 로 그린 가짜 화면을 쓴다 =======================
 const IMG={};   // 캡처 PNG 를 쓰는 모션이면 {키: ['pages/이름.png', CSS폭, CSS높이]} 로 채운다
-const APP={x:320,y:240,s:1,w:1280,h:820};   // 앱 창 왼쪽 위(무대 px), 배율
+const APP={x:320,y:288,s:1.25,w:1280,h:772};   // 앱 화면 왼쪽 위(무대 px, 창 막대 48px 아래), 배율(앱 안 좌표는 확대 전 값)
 const CC={x:320,y:240,k:1280/1460};             // 터미널 창 배율(그림 px → 무대 px)
-const R={   // 앱 안 사각형(CSS px, 앱 왼쪽 위 기준)
-  newBtn:{x:1080,y:22,w:140,h:44}, titleInput:{x:260,y:160,w:720,h:52}, saveBtn:{x:1100,y:22,w:120,h:44}, newRow:{x:260,y:120,w:960,h:80},
+const R={   // 앱 안 사각형(CSS px, 앱 왼쪽 위 기준). measure 의 measureApp 이 DOM 에서 재어 채운다
+  newBtn:{x:0,y:0,w:0,h:0}, titleInput:{x:0,y:0,w:0,h:0}, saveBtn:{x:0,y:0,w:0,h:0}, newRow:{x:0,y:0,w:0,h:0},
 };
-// 문제 박스: 강조할 사각형과 박스 자리(앱 좌표). ax 가로 기준(l, r, c), ay 세로 기준(t, b)
+// 문제 박스: 강조할 사각형과 박스 자리(앱 좌표, 값을 돌려주는 함수도 된다). ax 가로 기준(l, r, c), ay 세로 기준(t, b)
 const ISS={
-  s2_issue:{txt:'제목을 비워도 저장되어 제목 없는 메모가 생깁니다',rings:()=>[aBox(R.newRow)],box:{x:1220,y:226,ax:'r',ay:'t'}},
+  s2_issue:{txt:'제목을 비워도 저장되어 제목 없는 메모가 생깁니다',rings:()=>[aBox(R.newRow)],box:()=>({x:R.newRow.x+R.newRow.w,y:R.newRow.y+R.newRow.h+26,ax:'r',ay:'t'})},
 };
 
 // ======================= [공용] 수학, 도구 =======================
@@ -254,7 +206,7 @@ function rebuild(){
     return {V,FP};};
   const add=(tc,ptFn,boxFn,{touch=false,dark=false,ring=null,id}={})=>{const {V,FP}=fxOf(id);
     const c={id,tc,pt:ptFn(tc),box:boxFn(tc),touch,dark,V,FP,o:ClickFX.buildOverlay(fx,$('fxDiv'),V)};
-    if(touch){c.dot=document.createElement('div');c.dot.className='dot';$('dots').appendChild(c.dot);}
+    if(touch){c.dot=document.createElement('div');c.dot.className='dot status status-neutral';$('dots').appendChild(c.dot);}
     clicks.push(c);if(ring)rings.push(ring);};
   // [기능마다] 클릭 대상(무대 좌표)
   const TG={s1_clickNew:aBox(R.newBtn),s1_clickTitle:aBox(R.titleInput),s1_clickSave:aBox(R.saveBtn)};
@@ -262,11 +214,11 @@ function rebuild(){
   const PT={s1_clickTitle:b=>[b.x+b.w*0.2,b.y+b.h/2]};
   const ptOf=id=>(PT[id]||ctr)(TG[id]);
   for(const id in TG)add(T[id].press,()=>ptOf(id),()=>withR(TG[id],RAD[id]),{dark:false,id});
-  // [기능마다] 강조(파랑 = 보기, 주황 = 문제)
-  const hr=(boxFn,id,pad=8,color='rgb(31,102,241)')=>{const r=T[id];return {boxFn,t0:r.s,t1:r.e,fi:r.v.in/1000,fo:r.v.out/1000,id,pad,color};};
+  // [기능마다] 강조(파랑 info = 보기, 주황 warning = 문제)
+  const hr=(boxFn,id,pad=8,tone='info')=>{const r=T[id];return {boxFn,t0:r.s,t1:r.e,fi:r.v.in/1000,fo:r.v.out/1000,id,pad,tone};};
   rings.push(hr(()=>aBox(R.newRow),'s2_ringRow',4));
-  for(const id in ISS)ISS[id].rings().forEach((_,i)=>rings.push(hr(()=>ISS[id].rings()[i],id,6,'#b25e09')));
-  rings.forEach(r=>{r.el=mk('rect',{fill:'none',stroke:r.color,'stroke-width':r.color==='#b25e09'?4:3,rx:12});fx.insertBefore(r.el,fx.firstChild);});
+  for(const id in ISS)ISS[id].rings().forEach((_,i)=>rings.push(hr(()=>ISS[id].rings()[i],id,6,'warning')));
+  rings.forEach(r=>{r.el=mk('rect',{class:'text-'+r.tone,fill:'none',stroke:'currentColor','stroke-width':r.tone==='warning'?4:3,rx:12});fx.insertBefore(r.el,fx.firstChild);});
   // [기능마다] 커서 이동 목록: [glide 단계, 도착 클릭 단계]
   const MV=[['s1_glideNew','s1_clickNew'],['s1_glideTitle','s1_clickTitle'],['s1_glideSave','s1_clickSave']];
   moves=MV.map(([g,c])=>({t0:T[g].s,t1:T[g].e,k:T[g].v.curve/100,to:ptOf(c),id:g}));
@@ -282,25 +234,33 @@ const cursorOn=t=>t>=T.s1_glideNew.s-0.2&&t<T.s3_toCC.s;   // 터미널 장면�
 const inside=(p,b)=>p&&p[0]>=b.x&&p[0]<=b.x+b.w&&p[1]>=b.y&&p[1]<=b.y+b.h;
 
 // ======================= [기능마다] 그린 요소 만들기, 재기 (글꼴을 불러온 뒤) =======================
+// 터미널 글의 자리: 그림 좌표(px) → #ccTerm 안 좌표. #ccTerm 은 글자 크기 14px 를 30px 로 키운 것(배율 30/14)이고 그림 좌표 x 2, y 147 에서 시작한다
+const TS=30/14,cLx=v=>(v-2)/TS,cLy=v=>(v-147)/TS;
 function build(){
-  for(const id in ISS){const d=document.createElement('div');d.className='issue';d.id='iss_'+id;d.innerHTML='<b>문제</b><span></span>';d.querySelector('span').textContent=ISS[id].txt;$('issues').appendChild(d);}
-  for(const n in MotionSteps.SENTENCES)MotionSteps.SENTENCES[n].forEach((s,i)=>{const d=document.createElement('div');d.className='sent l'+(i+1);d.id='sent'+n+'_'+(i+1);d.textContent=s;$('sents').appendChild(d);});
-  $('ccMsg0').textContent='> '+MotionSteps.TXT.prompt;
+  for(const id in ISS){const d=document.createElement('div');d.className='issue';d.id='iss_'+id;
+    d.innerHTML='<span class="alert alert-warning alert-soft" style="zoom:1.5;white-space:nowrap"><span class="badge badge-warning">문제</span><span class="txt"></span></span>';   // 문제 박스: daisyUI alert 와 badge, 24px 글자(zoom)
+    d.querySelector('.txt').textContent=ISS[id].txt;$('issues').appendChild(d);}
+  for(const n in MotionSteps.SENTENCES)MotionSteps.SENTENCES[n].forEach((s,i)=>{const d=document.createElement('div');d.className='sent';d.id='sent'+n+'_'+(i+1);
+    d.style.cssText='left:120px;top:'+(i?166:114)+'px;white-space:nowrap';   // 문장 자리: 위 문장 y 114(글자 40px 굵게), 아래 문장 y 166(글자 34px)
+    d.innerHTML=i?'<span style="zoom:2.125"></span>':'<span style="zoom:2.5"><b></b></span>';(d.querySelector('b')||d.firstChild).textContent=s;$('sents').appendChild(d);});
+  $('ccMsg0').firstChild.textContent='> '+MotionSteps.TXT.prompt;
 }
 build();
+// 앱 안 요소의 사각형(CSS px, 앱 왼쪽 위 기준)을 레이아웃 값(offset)으로 잰다(변형과 무대 배율에 영향받지 않음)
+const rel=el=>{let x=0,y=0,e=el;while(e&&e!==$('appz')){x+=e.offsetLeft;y+=e.offsetTop;e=e.offsetParent;}return {x,y,w:el.offsetWidth,h:el.offsetHeight};};
+function measureApp(){
+  // 숨은 요소도 잴 수 있게 창과 화면을 잠시 모두 보인다
+  const hid=['win','vList','vEdit','rowNew','snack'].map(id=>[$(id),$(id).style.display]);hid.forEach(([e])=>{e.style.display='';});
+  R.newBtn=rel($('btnNew'));R.saveBtn=rel($('btnSave'));R.titleInput=rel($('titleBox'));R.newRow=rel($('rowNew'));
+  MEAS.snack=$('snack').offsetWidth*APP.s;
+  hid.forEach(([e,d])=>{e.style.display=d;});
+}
 function measure(){
   const zk=$('stage').style.zoom;$('stage').style.zoom=1;
   for(const id in ISS){const el=$('iss_'+id),d=el.style.display;el.style.display='';MEAS[id]={w:el.offsetWidth,h:el.offsetHeight};el.style.display=d;}
-  // 숨은 요소도 잴 수 있게 창을 잠시 보인다
-  const win=$('win'),dw=win.style.display,vE=$('vEdit'),dv=vE.style.display,cw=$('ccWin'),dc=cw.style.display;win.style.display=vE.style.display=cw.style.display='';
-  const it=$('inTxt'),title=MotionSteps.TXT.title;MEAS.typed=[];
-  for(let i=0;i<=title.length;i++){it.textContent=title.slice(0,i);MEAS.typed.push(it.offsetWidth);}
-  it.textContent='';
-  const sn=$('snack'),ds=sn.style.display;sn.style.display='';MEAS.snack=sn.offsetWidth;sn.style.display=ds;
-  $('ccBar0').style.width=(11+$('ccMsg0').offsetWidth+18)+'px';
-  win.style.display=dw;vE.style.display=dv;cw.style.display=dc;
+  measureApp();fitChips();
   $('stage').style.zoom=zk;
-  for(const id in ISS){const b=ISS[id].box,el=$('iss_'+id),m=MEAS[id];
+  for(const id in ISS){const b=typeof ISS[id].box==='function'?ISS[id].box():ISS[id].box,el=$('iss_'+id),m=MEAS[id];
     const p=[APP.x+b.x*APP.s,APP.y+b.y*APP.s];
     el.style.left=(b.ax==='r'?p[0]-m.w:b.ax==='c'?p[0]-m.w/2:p[0])+'px';el.style.top=(b.ay==='b'?p[1]-m.h:p[1])+'px';}
 }
@@ -333,32 +293,31 @@ function render(tr){
   const cOn=cursorOn(t),cPos=cOn?cursorAt(t):null;
   // 앱: 목록 ↔ 새 메모 편집, 새 메모가 들어가면 아래 항목이 한 칸 내려감
   show($('vList'),pg!=='edit'?1:0);show($('vEdit'),pg==='edit'?1:0);
-  const hasNew=pg==='list1';show($('rowNew'),hasNew?1:0);
-  ['r0','r1','r2'].forEach((id,i)=>{$(id).style.top=(120+96*(i+(hasNew?1:0)))+'px';});
-  // 제목 입력: 클릭하면 포커스, 글자는 type 단계의 시각표대로 나타남
+  const hasNew=pg==='list1';show($('rowNew'),hasNew?1:0);   // 목록은 daisyUI list 라서 새 항목이 들어가면 아래 항목이 저절로 내려간다
+  // 제목 입력: 클릭하면 포커스(input-info 테두리), 글자는 type 단계의 시각표대로 나타남
   const focus=pg==='edit'&&t>=T.s1_clickTitle.press,n=typed(T.s1_type.ts,t),title=MotionSteps.TXT.title;
-  show($('inFocus'),focus?1:0);
+  $('titleBox').classList.toggle('input-info',focus);
   $('inTxt').textContent=pg==='edit'?title.slice(0,n):'';
-  show($('inPh'),pg==='edit'&&n===0?1:0);
+  $('inPh').style.display=pg==='edit'&&n===0?'':'none';
   const typing=n>0&&t<T.s1_type.e+0.4;
-  show($('caret'),focus&&(typing||Math.floor(t*2)%2===0)?1:0);$('caret').style.left=(278+(MEAS.typed?MEAS.typed[n]:0)+1)+'px';
+  $('caret').style.visibility=focus&&(typing||Math.floor(t*2)%2===0)?'visible':'hidden';
   // 스낵바
   const sn=snackOn(t),sa=sn?ioC(seg(t,navMid('s1_nav2'),navMid('s1_nav2')+0.18)):0;show($('snack'),sa);
-  if(sa>0){$('snack').style.left=(640-(MEAS.snack||310)/2)+'px';$('snack').style.transform='translateY('+(8*(1-sa))+'px)';}
+  if(sa>0){$('snack').style.left=(512-(MEAS.snack||310)/APP.s/2)+'px';$('snack').style.transform='translateY('+(8*(1-sa))+'px)';}
   // 창 안 흰색 거치기
   const ft=(t0,o,i)=>t<t0?0:t<t0+o?ioC(seg(t,t0,t0+o)):1-ioC(seg(t,t0+o,t0+o+i));
   const nv=id=>ft(T[id].s,T[id].v.out/1000,T[id].v.in/1000),lx=T.s3_loop.v;
   show($('veil'),Math.max(...NAVS.map(nv),ft(T.s3_loop.s,lx.out/1000,(lx.inDelay+lx.in-lx.out)/1000)));
   // 터미널: 입력, 전송, 응답 줄
   if(cw.o>0){$('cc').style.transform='scale('+CC.k+')';
-    const tn=typed(T.s3_type.ts,t),sent=t>=T.s3_key.press,TS=MotionSteps.TXT.prompt,rp=T.s3_reply;
-    $('ccTyped').textContent=sent?'':TS.slice(0,tn);
-    show($('ccBar0'),sent?1:0);show($('ccMsg0'),sent?1:0);
+    const tn=typed(T.s3_type.ts,t),sent=t>=T.s3_key.press,PR=MotionSteps.TXT.prompt,rp=T.s3_reply;
+    $('ccTyped').textContent=sent?'':PR.slice(0,tn);
+    show($('ccMsg0'),sent?1:0);
     const lineAt=i=>rp.s+(rp.v.first+i*rp.v.each)/1000,lastAt=lineAt(MotionSteps.REPLY_LINES-1);
     [0,1].forEach(i=>show($('ccR'+i),sent?seg(t,lineAt(i)-0.15,lineAt(i)):0));
     show($('ccSpin'),sent&&t<lastAt?1:0);
     const sep=sent?348+38*4:322;
-    $('ccSep1').style.top=sep+'px';$('ccIn').style.top=(sep+19)+'px';$('ccSep2').style.top=(sep+76)+'px';$('ccFootL').style.top=$('ccFootR').style.top=(sep+93)+'px';}
+    $('ccSep1').style.top=cLy(sep)+'px';$('ccIn').style.top=cLy(sep+19)+'px';$('ccSep2').style.top=cLy(sep+76)+'px';$('ccFootL').style.top=$('ccFootR').style.top=cLy(sep+93)+'px';}
   // 문제 박스
   for(const id in ISS){const r=T[id],a=ioC(seg(t,r.s,r.s+r.v.in/1000))*(1-ioC(seg(t,r.e-r.v.out/1000,r.e))),el=$('iss_'+id);
     show(el,t>=r.s&&t<=r.e?a:0);el.style.transform=`translateY(${6*(1-a)}px)`;}
@@ -377,7 +336,7 @@ function render(tr){
     const live=d>-400&&d<ClickFX.effectEnd(c.V,c.FP)+400;c.o.g.style.display=live?'':'none';c.o.els.forEach(e=>{if(!live)e.style.display='none';});
     if(live)ClickFX.renderOverlay(c.o,d,c.FP,{x,y,box:c.box,dark:c.dark,touch:c.touch,pointer:c.touch?null:cPos});
     if(!c.touch){press=Math.min(press,ClickFX.pressScale(d,c.FP));if(Math.abs(d)<Math.abs(discD)){discD=d;discC=c;}}});
-  const cu=$('cursor'),co=cOn?1:0,discE=discC&&discC.V==='E',cd=$('curDisc');show(cu,co);show(cd,discE?co:0);
+  const cu=$('cursor'),co=cOn?1:0,discE=discC&&discC.V==='E',cd=$('curDisc');show(cu,co);show(cd,discE?co*0.35:0);
   if(co>0){const [x,y]=cPos;cu.style.transform=`translate(${x-2}px,${y-2}px) scale(${press})`;
     if(discE){const sz=ClickFX.discSize(discD,discC.FP);Object.assign(cd.style,{left:x-sz/2+'px',top:y-sz/2+'px',width:sz+'px',height:sz+'px'});}}
   clicks.forEach(c=>{c.o.g.style.opacity=hw.o;});   // 창이 사라지면 클릭 효과도 함께
@@ -401,10 +360,12 @@ function clickParamsFrom(src){const all=ClickFX.defaults();
   if(src)for(const v in all)for(const k of ClickFX.effectKeys(v))for(const f in all[v][k]){const x=src[v]&&src[v][k]&&src[v][k][f];if(typeof x==='number'&&isFinite(x))all[v][k][f]=x;}
   return all;}
 window.capEditing=0;
+// 칩 폭을 짝수 정수 px 로 맞춘다(가운데 정렬 translateX(-50%)가 정수 px 가 되어 같은 t 면 같은 픽셀이 나온다). 무대 배율 1 에서만 부른다
+function fitChips(){for(const n in MotionSteps.CAPTIONS){const el=$('cap'+n),d=el.style.display;el.style.width='';el.style.display='';el.style.width=2*Math.ceil(el.offsetWidth/2)+'px';el.style.display=d;}window.chipsFit=true;}
 function applyCaptions(){for(const n in MotionSteps.CAPTIONS){if(window.capEditing===+n)continue;const el=$('cap'+n),d=MotionSteps.CAPTIONS[n],c=P.scenes[n]||{};
   const role=(c.role||'').trim()||d.role,title=(c.title||'').replace(/\r/g,'').split('\n').map(x=>x.trim()).filter(Boolean).slice(0,2).join('\n')||d.title;
   const key=role+'|'+title;if(el._k===key)continue;el._k=key;
-  el.querySelector('.role').textContent=role;el.querySelector('.ttl').textContent=title.replace(/\n/g,' ');}}
+  el.querySelector('.role').textContent=role;el.querySelector('.role').hidden=!role;el.querySelector('.ttl').textContent=title.replace(/\n/g,' ');}if(window.chipsFit)fitChips();}
 window.captionOverflow=n=>$('cap'+n).offsetWidth>760;
 function applyParams(state,clickSrc){P=MotionSteps.merge(state);CP=clickParamsFrom(clickSrc||P.clickParams);applyCaptions();rebuild();if(typeof draw==='function')draw();}
 window.applyParams=applyParams;
@@ -430,6 +391,10 @@ window.setZoom=k=>{zoomK=k;layout();};
 if(BOX)document.body.classList.add('box');
 if(EXPORT||EMBED)document.body.classList.add('export');
 if(DECK)document.documentElement.classList.add('deck');   // [기능마다] 발표 모드
+// 페이지 바탕은 daisyUI 색 클래스로 정한다: 기본 보기(편집) base-300, ?box=1 base-100(둥근 무대 rounded-box), 그 밖(발표 모드, 내보내기) base-200
+const PAGE_BG=(EXPORT||EMBED||DECK)?'bg-base-200':BOX?'bg-base-100':'bg-base-300';
+[document.documentElement,document.body].forEach(e=>e.classList.add(PAGE_BG));
+if(BOX)$('wrap').classList.add('rounded-box');
 addEventListener('resize',layout);layout();
 function draw(){render(now);$('scrub').value=Math.round(now/DURATION*1000);$('tm').textContent=now.toFixed(2)+' s';
   if(window.presentUI)presentUI();}   // [기능마다] 발표 모드: 진행 표시, 이전 버튼
@@ -442,7 +407,9 @@ addEventListener('keydown',e=>{if(EMBED||DECK)return;   // [기능마다] 발표
   if(e.code==='Space'){playing=!playing;e.preventDefault();}
   if(e.code==='ArrowRight'||e.code==='ArrowLeft'){playing=false;const s=(e.shiftKey?1:1/30)*(e.code==='ArrowRight'?1:-1);seek(((now+s)%DURATION+DURATION)%DURATION);e.preventDefault();}});
 const IMGS=['pages/cc/cc-best@2x.png'];
-window.ready=Promise.all([loadParams(),...IMGS.map(u=>{const i=new Image();i.src=u;return i.decode();}),
+// daisyUI CSS 와 ui.css(head 의 link)를 못 불러왔으면 실패한다(스타일 없는 맨 글자 프레임을 저장하지 않게)
+const cssReady=()=>{const bad=[...document.querySelectorAll('link[rel=stylesheet]')].filter(l=>!l.sheet).map(l=>l.href);return bad.length?Promise.reject(new Error('CSS 를 불러오지 못함: '+bad.join(' '))):Promise.resolve();};
+window.ready=Promise.all([loadParams(),cssReady(),...IMGS.map(u=>{const i=new Image();i.src=u;return i.decode();}),
   document.fonts.load('400 15px "Pretendard Variable"','가나 ab'),document.fonts.load('700 15px "Pretendard Variable"','가나 ab'),document.fonts.ready,
 ]).then(r=>{window.paramsSource=r[0];measure();rebuild();draw();if(!EXPORT&&!EMBED)requestAnimationFrame(loop);});
 draw();
@@ -487,7 +454,7 @@ window.presentUI=()=>{if(!DECK)return;
   if($('progN').textContent!==txt)$('progN').textContent=txt;
   $('prev').disabled=k<1;};
 if(DECK){
-  $('stage').addEventListener('click',e=>{if(e.target.closest('#prev,#autoLbl'))return;advance();});
+  $('stage').addEventListener('click',e=>{if(e.target.closest('#prevBox,#autoLbl'))return;advance();});
   $('prev').addEventListener('click',()=>{back();$('prev').blur();});
   $('auto').checked=autoOn;
   $('auto').addEventListener('change',()=>{autoOn=$('auto').checked;draw();});

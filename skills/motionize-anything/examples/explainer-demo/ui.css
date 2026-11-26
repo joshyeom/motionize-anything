@@ -1,67 +1,85 @@
-/* 설명 모션의 화면 조각(kit.ui)이 쓰는 작은 CSS. shadow root 안에 불러온다.
-   색과 글꼴은 --mx-* 변수 한 곳에 모았다. kit.W(scenes/kit.js)와 같은 값이다. 바꿀 때는 둘을 함께 바꾼다. */
-:host {
-  --mx-font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
-  --mx-text: #0F172A;
-  --mx-subtle: #64748B;
-  --mx-line: #E2E8F0;
-  --mx-strong: #CBD5E1;
-  --mx-muted: #F1F5F9;
-  --mx-white: #FFFFFF;
-  --mx-black: #000000;
-  --mx-blue: #2563EB;
-  --mx-blue-bg: #EFF6FF;
-  --mx-blue-bd: #BFDBFE;
-  --mx-warn: #92400E;
-  --mx-warn-bg: #FFFBEB;
-  --mx-warn-bd: #FDE68A;
-  --mx-error: #B91C1C;
-  --mx-error-bg: #FEF2F2;
-  --mx-error-bd: #FECACA;
-  --mx-success: #16A34A;
-  --mx-success-bg: #F0FDF4;
-  --mx-success-bd: #BBF7D0;
+/* motionize 의 daisyUI 5 테마. 색은 이 파일의 테마(data-theme="motionize") 하나에서만 정한다.
+   모든 모션(설명 모션, 사용법 모션, 시작 틀과 예시)의 index.html 이 <html data-theme="motionize"> 로 적용하고,
+   daisyUI CSS(버전 고정 CDN) 바로 뒤에 불러온다. 같은 이름 파일은 네 폴더가 내용이 같다. */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+
+[data-theme="motionize"] {
+  color-scheme: light;
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.5;
+  /* 팔레트: 바탕 흰색과 옅은 회색, 기본 검정, 정보 파랑, 성공 초록, 경고 주황과 호박, 오류 빨강 */
+  --color-base-100: #FFFFFF;
+  --color-base-200: #F1F5F9;
+  --color-base-300: #E2E8F0;
+  --color-base-content: #0F172A;
+  --color-primary: #000000;
+  --color-primary-content: #FFFFFF;
+  --color-secondary: #F1F5F9;
+  --color-secondary-content: #0F172A;
+  --color-accent: #2563EB;
+  --color-accent-content: #FFFFFF;
+  --color-neutral: #64748B;
+  --color-neutral-content: #FFFFFF;
+  --color-info: #2563EB;
+  --color-info-content: #FFFFFF;
+  --color-success: #16A34A;
+  --color-success-content: #FFFFFF;
+  --color-warning: #92400E;
+  --color-warning-content: #FFFFFF;
+  --color-error: #B91C1C;
+  --color-error-content: #FFFFFF;
+  --radius-selector: 6px;
+  --radius-field: 8px;
+  --radius-box: 12px;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+  --root-bg: var(--color-base-200);   /* 페이지와 무대 바탕 */
+  /* 설명 모션 초점 색: 채움(-bg), 테두리(이름만), 채움 밖 글자(-text). blue 흐름과 단위, green 마침과 반영, yellow 남음과 주의 */
+  --color-focus-blue-bg: #CFE4F8;
+  --color-focus-blue: #7EB3E3;
+  --color-focus-blue-text: #2D6CB0;
+  --color-focus-green-bg: #D3EEDB;
+  --color-focus-green: #7DC495;
+  --color-focus-green-text: #2E7A4C;
+  --color-focus-yellow-bg: #FBE8AE;
+  --color-focus-yellow: #E2B94F;
+  --color-focus-yellow-text: #8A6914;
+  /* 자막 하이라이트 */
+  --color-mark-blue: #D6E8FA;
+  --color-mark-green: #D5EFDD;
+  --color-mark-yellow: #FBEAB5;
+  /* 진한 테두리, 점선 테두리, 조각 카드의 노랑 띠 */
+  --color-strong: #CBD5E1;
+  --color-n300: #94A3B8;
+  --color-amber: #FCD34D;
+  /* 사용법 모션: 동작 파랑, 활성 항목 옅은 파랑 배경, 문제 주황, 스낵바 바탕, 스낵바 안 동작 글자 */
+  --color-usage-blue: #1F66F1;
+  --color-usage-blue-soft: #E8F0FE;
+  --color-usage-blue-light: #97BFFA;
+  --color-issue: #B25E09;
+  --color-usage-ink: #1A1F27;
+  /* 클릭 효과: 물방울 파랑과 노란 번쩍임(커서 원) */
+  --color-click-blue: #3182F3;
+  --color-click-yellow: #EDFF00;
+  /* 사용법 모션의 터미널 그림(pages/cc/cc-best@2x.png) 위에 HTML 로 덮어 그리는 글과 칸의 색. 그림의 색과 맞춘 값이다 */
+  --color-term-bg: #002B36;
+  --color-term-fg: #839496;
+  --color-term-bold: #93A1A1;
+  --color-term-dim: #3C626B;
+  --color-term-red: #6B333C;
+  --color-term-green: #01BC5A;
+  --color-term-orange: #D77757;
+  --color-term-line: #3C5B67;
+  --color-term-bar: #363736;
+  --color-term-title-bg: #F5F2F5;
+  --color-term-title-fg: #4B484B;
 }
 
-/* 배너 (높이 49) */
-.mx-Banner { display: flex; align-items: center; gap: 8px; box-sizing: border-box; height: 49px; padding: 0 20px 0 16px; border-radius: 12px; border: 1px solid var(--bd); background: var(--bg); color: var(--fg); font-size: 14px; font-weight: 500; white-space: nowrap; }
-.mx-Banner[data-tone="warning"] { --bg: var(--mx-warn-bg); --bd: var(--mx-warn-bd); --fg: var(--mx-warn); }
-.mx-Banner[data-tone="info"] { --bg: var(--mx-blue-bg); --bd: var(--mx-blue-bd); --fg: var(--mx-blue); }
-.mx-Banner[data-tone="neutral"] { --bg: var(--mx-muted); --bd: var(--mx-line); --fg: var(--mx-text); }
-.mx-Banner[data-tone="success"] { --bg: var(--mx-success-bg); --bd: var(--mx-success-bd); --fg: var(--mx-success); }
-.mx-Banner[data-tone="error"] { --bg: var(--mx-error-bg); --bd: var(--mx-error-bd); --fg: var(--mx-error); }
-.mx-Banner__icon { display: flex; flex: none; }
-.mx-Banner__body { min-width: 0; }
+/* 배치용: Tailwind 기본 스타일(preflight)이 없어서 daisyUI 컴포넌트가 기대하는 상자 크기 계산 하나만 맞춘다 */
+[data-theme="motionize"] *, [data-theme="motionize"] *::before, [data-theme="motionize"] *::after { box-sizing: border-box; }
 
-/* 버튼 (sm 높이 40) */
-.mx-Button { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; height: 40px; padding: 0 16px; border: 1px solid transparent; border-radius: 8px; font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; }
-.mx-Button[data-color="primary"] { background: var(--mx-black); color: var(--mx-white); }
-.mx-Button[data-color="secondary"] { background: var(--mx-muted); color: var(--mx-text); border-color: var(--mx-strong); }
-
-/* 선택 (md 20px) */
-.mx-Radio { display: flex; align-items: center; }
-.mx-Radio__box { display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: 20px; height: 20px; border: 2px solid var(--mx-strong); border-radius: 50%; background: var(--mx-white); }
-.mx-Radio__dot { width: 10px; height: 10px; border-radius: 50%; background: transparent; }
-.mx-Radio[data-value="on"] .mx-Radio__box { border-color: var(--mx-black); }
-.mx-Radio[data-value="on"] .mx-Radio__dot { background: var(--mx-black); }
-
-/* 입력 필드 (TextInput 높이 40, Textarea 높이 89) */
-.mx-Field { display: block; }
-.mx-Field__box { display: flex; align-items: center; box-sizing: border-box; height: 40px; padding: 0 12px; border: 1px solid var(--mx-strong); border-radius: 8px; background: var(--mx-white); }
-.mx-Field__value { width: 100%; min-width: 0; padding: 0; border: 0; outline: 0; background: transparent; font: inherit; font-size: 14px; color: var(--mx-text); resize: none; }
-.mx-Textarea .mx-Field__box { align-items: flex-start; height: 89px; padding: 10px 12px; }
-.mx-Textarea .mx-Field__value { height: 100%; }
-
-/* 카드, 배지, 막대 */
-.mx-Card { display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; padding: 16px 20px; border: 1px solid var(--mx-line); border-radius: 12px; background: var(--mx-white); }
-.mx-Card__title { font-size: 16px; font-weight: 700; line-height: 1.4; }
-.mx-Badge { display: inline-flex; align-items: center; box-sizing: border-box; height: 24px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; background: var(--mx-muted); color: var(--mx-text); }
-.mx-Badge[data-size="xs"] { height: 20px; padding: 0 6px; font-size: 11px; }
-.mx-Badge[data-color="info"] { background: var(--mx-blue-bg); color: var(--mx-blue); }
-.mx-Badge[data-color="primary"] { background: var(--mx-black); color: var(--mx-white); }
-.mx-Badge[data-color="secondary"] { background: var(--mx-muted); color: var(--mx-subtle); }
-.mx-Badge[data-color="positive"] { background: var(--mx-success-bg); color: var(--mx-success); }
-.mx-Badge[data-color="cautionary"] { background: var(--mx-warn-bg); color: var(--mx-warn); }
-.mx-Badge[data-color="negative"] { background: var(--mx-error-bg); color: var(--mx-error); }
-.mx-Skeleton { display: flex; flex-direction: column; gap: 8px; }
-.mx-Skeleton__bar { display: block; height: 12px; border-radius: 6px; background: var(--mx-line); }
+/* 배치용: 같은 t 면 같은 그림이어야 해서 kit.ui 마크업(.kw) 안의 CSS 애니메이션과 transition 을 끈다(daisyUI skeleton 의 반짝임 등) */
+[data-theme="motionize"] .kw *, [data-theme="motionize"] .kw *::before, [data-theme="motionize"] .kw *::after { animation: none !important; transition: none !important; }

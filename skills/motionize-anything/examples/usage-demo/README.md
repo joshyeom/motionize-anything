@@ -28,8 +28,8 @@ python3 -m http.server 8975 --bind 127.0.0.1
 
 ## 그린 것
 
-- 앱 화면은 모두 HTML 요소입니다. 캡처 이미지는 쓰지 않았습니다.
-- 터미널 장면은 `pages/cc/cc-best@2x.png` 위에 경로, 제목, 입력, 응답 글을 덮어 그렸습니다.
+- 앱 화면은 모두 daisyUI 컴포넌트(`mockup-window`, `menu`, `navbar`, `list`, `btn`, `input`, `textarea`, `alert`)입니다. 캡처 이미지는 쓰지 않았습니다. 색은 `ui.css` 의 daisyUI 테마 하나가 정합니다.
+- 터미널 장면은 `pages/cc/cc-best@2x.png` 위에 경로, 제목, 입력, 응답 글을 덮어 그렸습니다. 덮개는 daisyUI `mockup-code` 이고 색은 그림의 색에 맞춘 테마 변수(`--color-term-*`)입니다.
 
 ## 뺀 것, 실제와 다른 점
 

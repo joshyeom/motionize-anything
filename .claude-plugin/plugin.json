@@ -1,6 +1,6 @@
 {
   "name": "motionize-anything",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "제품 사용법과 개념 설명을 화면 녹화 없이 HTML 모션으로 만든다. 클릭으로 넘기는 발표 모드, mp4 내보내기, 기준 프레임 비교, PR 미리보기를 지원한다.",
   "author": {
     "name": "joshyeom"

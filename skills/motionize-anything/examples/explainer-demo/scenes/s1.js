@@ -1,5 +1,5 @@
 // 장면 1 지금: 첫 컷의 초점은 큰 92% 와 초록 체크가 찬 단계 칸 24개(빈 점선 칸 2개는 회색 윤곽)다. 둘째 컷은 칸과 이름표가 사라지고 92% 는 DIM 으로 남으며, 카드 4개(완료 확인 2개, 판단 2개)가 초점이다.
-// 직접 그린 것: 단계 칸, 카드, 텍스트. 화면 글은 모두 TEXT 에 있다.
+// 모든 그림은 daisyUI 로 그린다: 큰 숫자(kit.stat), 단계 칸과 카드(kit.tile = alert), 이름표(kit.text). 화면 글은 모두 TEXT 에 있다.
 (function () {
   const TEXT = {
     sentence1: '검색 도구는 작업 단계 수로 92%까지 왔습니다',
@@ -14,28 +14,23 @@
 
   MotionScenes.register(1, {
     build(root, kit) {
-      const W = kit.W, G = kit.FOCUS.green, Y = kit.FOCUS.yellow;
-      pct = kit.box(root, { x: 0, y: 140, w: 1920, h: 260, text: TEXT.pct, size: 240, weight: 800, color: G.text, align: 'center', num: true });
-      name = kit.box(root, { x: GX, y: GY - 62, h: 48, text: TEXT.name, size: 34, weight: 700, color: W.subtle });
+      pct = kit.stat(root, { cx: 960, cy: 270, s: 7.5, value: TEXT.pct, tone: 'green' });
+      name = kit.text(root, { x: GX, y: GY - 62, size: 34, tone: 'neutral', text: TEXT.name });
       for (let i = 0; i < TOTAL; i++) {
-        const cell = kit.box(root, { x: GX + (i % COLS) * (CS + CG), y: GY + Math.floor(i / COLS) * (CS + CG), w: CS, h: CS });
-        cell.base = kit.box(cell, { x: 0, y: 0, w: CS, h: CS, radius: 16, bg: W.white, border: '3px dashed ' + W.n300 });
-        if (i < DONE) {
-          cell.green = kit.box(cell, { x: 0, y: 0, w: CS, h: CS, radius: 16, bg: G.bg, border: '3px solid ' + G.edge });
-          const tick = kit.box(cell.green, { x: (CS - 70) / 2, y: (CS - 70) / 2, w: 70, h: 70, color: G.ink });
-          tick.innerHTML = kit.icon('tick', 70);
-          cell.order = i;
-        }
+        const x = GX + (i % COLS) * (CS + CG), y = GY + Math.floor(i / COLS) * (CS + CG);
+        const cell = kit.tile(root, { x, y, w: CS, h: CS, base: true, variant: 'dash' });
+        if (i < DONE) { cell.green = kit.tile(cell, { x: 0, y: 0, w: CS, h: CS, tone: 'green', icon: 'tick', iconSize: 30 }); cell.order = i; }
         cells.push(cell);
       }
       TEXT.cards.forEach((text, i) => {
         const check = i < 2;   // 완료 확인은 노랑 채움, 판단은 흰 바탕 노랑 점선 테두리
-        cards.push(kit.box(root, { x: CARD_X + i * (CARD_W + CARD_G), y: CARD_Y, w: CARD_W, h: CARD_H, radius: 20, bg: check ? Y.bg : W.white, border: '4px ' + (check ? 'solid ' : 'dashed ') + Y.edge, text, size: 44, weight: 800, color: Y.ink, align: 'center' }));
+        cards.push(kit.tile(root, { x: CARD_X + i * (CARD_W + CARD_G), y: CARD_Y, w: CARD_W, h: CARD_H, size: 44, text, tone: 'yellow', variant: check ? '' : 'dash', base: !check }));
       });
       sent1 = kit.sentence(root, TEXT.sentence1, 1, [['92%', 'green']]);
       sent2 = kit.sentence(root, TEXT.sentence2, 2, [['완료 확인 2개', 'yellow'], ['단계 밖 판단 2개', 'yellow']]);
     },
     measure(kit) {
+      pct.fit(); name.fit();
       kit.fitSentence(sent1); kit.fitSentence(sent2);
       ready = true;
     },

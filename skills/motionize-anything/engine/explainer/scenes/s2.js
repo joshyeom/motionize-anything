@@ -1,5 +1,5 @@
-// 장면 2 재사용: 첫 컷의 초점은 화면 A 의 배너(파랑 테두리), 둘째 컷은 화면 A 와 B 의 같은 배너 둘(파랑), 셋째 컷은 두 배너가 함께 바뀐 초록 배너 둘이 초점이다. 화면 판은 회색 윤곽이다.
-// 직접 그린 그림: 화면 판(kit.plate). ui.css 로 그린 것: 배너(kit.banner). 화면 글은 모두 TEXT 에 있다.
+// 장면 2 재사용: 첫 컷의 초점은 화면 A 의 배너(파랑 테두리), 둘째 컷은 화면 A 와 B 의 같은 배너 둘(파랑), 셋째 컷은 두 배너가 함께 바뀐 초록 배너 둘이 초점이다. 화면 판은 mockup-window 다.
+// 모든 그림은 daisyUI 로 그린다: 화면 판(kit.plate = mockup-window), 테두리 채움(kit.tile 의 초점 색), 배너(kit.banner = alert). 화면 글은 모두 TEXT 에 있다.
 (function () {
   const TEXT = {
     sentence1: '만들어 둔 블록은 여러 화면에서 다시 씁니다',
@@ -8,19 +8,18 @@
     plateA: '화면 A', plateB: '화면 B', banner: '같은 배너',
   };
   const PA = { x: 160, y: 280, w: 720, h: 560 }, PB = { x: 1040, y: 280, w: 720, h: 560 };
-  const BAN = { w: 600, s: 2.4, h: 118 }, PAD = 16;
+  const BAN = { w: 600, s: 2.4 }, PAD = 16;
   let sent1, sent2, sent3, plateA, plateB, frames = [], blue = [], green = [], ready = false;
 
   MotionScenes.register(2, {
     build(root, kit) {
-      const B = kit.FOCUS.blue, G = kit.FOCUS.green;
-      plateA = kit.plate(root, { ...PA, title: TEXT.plateA, titleSize: 36 });
-      plateB = kit.plate(root, { ...PB, title: TEXT.plateB, titleSize: 36 });
+      plateA = kit.plate(root, { ...PA, title: TEXT.plateA });
+      plateB = kit.plate(root, { ...PB, title: TEXT.plateB });
       // 판마다 배너 둘(파랑과 초록)을 같은 자리에 겹쳐 두고 셋째 컷에서 바꾼다. 테두리는 배너 아래에 깐다
       [PA, PB].forEach(P => {
         const x = P.x + (P.w - BAN.w) / 2, y = P.y + 200;
-        const fr = c => kit.box(root, { x: x - PAD, y: y - PAD, w: BAN.w + 2 * PAD, h: BAN.h + 2 * PAD, radius: 28, bg: c.bg, border: '6px solid ' + c.edge });
-        frames.push({ b: fr(B), g: fr(G) });
+        const fr = tn => kit.tile(root, { x: 0, y: 0, w: 100, h: 100, s: 4, tone: tn });
+        frames.push({ b: fr('blue'), g: fr('green'), x, y });
         blue.push(kit.banner(root, { x, y, w: BAN.w, s: BAN.s, tone: 'info', text: TEXT.banner }));
         green.push(kit.banner(root, { x, y, w: BAN.w, s: BAN.s, tone: 'success', text: TEXT.banner }));
       });
@@ -30,6 +29,10 @@
     },
     measure(kit) {
       blue.forEach(b => b.fit()); green.forEach(b => b.fit());
+      frames.forEach((f, i) => {
+        const h = blue[i]._b.h;
+        [f.b, f.g].forEach(e => { e.moveTo(f.x - PAD, f.y - PAD); e.resize((BAN.w + 2 * PAD) / e.s, (h + 2 * PAD) / e.s); });
+      });
       kit.fitSentence(sent1); kit.fitSentence(sent2); kit.fitSentence(sent3);
       ready = true;
     },

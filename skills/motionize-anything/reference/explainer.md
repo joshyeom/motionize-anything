@@ -16,7 +16,7 @@
 | 1. 리서치                 | 주제를 조사한다. 레포의 파일과 문서를 먼저 보고 모자라면 웹을 본다. 조사한 사실과 근거를 상세 문서 `source.md` 한 개에 적는다.                                                                                                                                        | 주장마다 근거(파일 경로와 기준 커밋, 또는 출처 주소)가 있음     |
 | 2. 큰 그림 초안           | 분석은 깊게 하되 설명은 가장 바깥쪽 큰 그림부터 한다. 10컷 안팎의 장면표와 컷마다 자막 1개를 `source.md` 에 적는다. 채팅에는 출력하지 않고 승인도 받지 않는다. 문장은 제작 전에 근거와 대조한다(codex 사실 대조).                                                     | 장면표와 문장이 `source.md` 에 있고 사실 대조를 통과            |
 | 3. 사전 테스트(필요할 때) | 볼 사람이 주제를 얼마나 아는지 요청에서 알 수 없으면 3문제를 낸다. 반드시 AskUserQuestion 도구로 묻는다. 볼 사람을 요청에서 알 수 없으면 같은 호출에 볼 사람을 묻는 문항 1개를 추가한다(문항은 모두 4개까지). 결과로 수준을 정해 초안의 낱말, 비유, 코드 양을 맞춘다. | 수준(처음, 조금 앎, 잘 앎)과 문제와 답을 `source.md` 에 기록    |
-| 4. 제작                   | 시작 틀의 발표 모드 엔진을 복사해 장면을 그린다. 화면의 UI 조각은 `kit.ui`(`ui.css`)로 그리고 도식 요소의 색은 팔레트(`kit.W`)로 정한다. 사물이나 비유를 그린 그림은 직접 그리지 않고 반드시 codex 에 요청해 그린다.                                      | 컷마다 프레임을 저장해 직접 봄, 페이지 오류 0건, 초점과 자막 규칙(8절) 확인                 |
+| 4. 제작                   | 시작 틀의 발표 모드 엔진을 복사해 장면을 그린다. 모든 화면 요소는 daisyUI 5 컴포넌트(`kit` 부품과 `kit.ui`)로 그리고 색은 테마 파일 `ui.css` 한 곳에서 정한다. 사물이나 비유를 그린 그림은 직접 그리지 않고 반드시 codex 에 요청해 그린다.                                      | 컷마다 프레임을 저장해 직접 봄, 페이지 오류 0건, 초점과 자막 규칙(8절) 확인                 |
 | 5. 컷 수 확인과 검증      | 컷(읽는 멈춤)이 8~12개인지 확인한다. 화면만 보는 역할 검증과 사실 대조를 한다.                                                                                                                                                                                        | 컷 수, 코드가 보이는 컷, 남은 문제를 보고                       |
 | 6. 이어 묻기              | 완료 보고 바로 뒤에 AskUserQuestion 으로 더 궁금한 것이 있는지 묻고, 질문은 질문 창의 직접 입력(Other)에 적게 한다. 질문이 오면 같은 세션에서 새 설명 모션으로 만들지, 대화로 답할지를 다시 AskUserQuestion 으로 묻고 선택대로 진행한다.                              | 사용자가 "없음"이나 "나중에 묻기"를 선택(질문 창을 닫아도 마침) |
 
@@ -34,7 +34,7 @@
    - 진행 보고나 결과 설명이면 첫 컷 자막이 결론이다.
    - 개념 설명이면 무엇인가부터 시작하고, 첫 컷 자막이 그 개념을 한 문장으로 정의한다.
 3. **한 컷에 자막 1개와 초점 1개만 둔다.** 자막은 화면 아래 한 줄이고 주장 하나를 완결 문장으로 말한다. 그림은 그 주장의 근거이고, 시선이 갈 초점은 컷마다 하나다. 같은 대상이 장면마다 다시 나오게 한다.
-4. **UI 조각은 ui.css 로 그린다.** 버튼, 배너, 입력 필드 같은 UI 조각은 직접 그리지 않고 `kit.ui` 로 `ui.css` 의 컴포넌트(`mx-` 클래스)를 불러온다. 간격, 모서리, 글자 크기는 그 컴포넌트의 값을 그대로 쓰고 배율만 정한다. `kit` 으로 그리는 도식 요소(박스, 화살표, 선, 카드)의 색은 팔레트 값(`kit.W`)만 쓴다.
+4. **화면 요소는 모두 daisyUI 로 그린다.** 박스, 칸, 배너, 버튼, 입력 필드, 카드, 배지, 화면 판 같은 요소는 직접 그리지 않고 `kit` 부품(`kit.tile`, `kit.banner` 등)과 `kit.ui` 로 daisyUI 5 컴포넌트(`alert`, `btn`, `radio`, `input`, `textarea`, `card`, `badge`, `stat`, `steps`, `mockup-window`, `skeleton` 클래스)를 불러온다. 색, 글꼴은 `ui.css` 의 daisyUI 테마 한 곳이 정한다. 간격, 테두리, 모서리, 글자 크기는 그 컴포넌트의 값에 배율(`s`)을 곱한 값이다. 장면 파일과 `kit` 에 색, 테두리, 모서리, 글자 크기를 직접 쓰지 않는다.
 5. **문장의 범위를 넓게 쓰지 않는다.** 우리 제품의 방식이면 주어를 그렇게 쓴다("리액트 컴포넌트는" 대신 "우리 제품의 배너 블록은"). 수치는 세는 기준과 기준 커밋을 `source.md` 에 적는다.
 6. **화면 요소 이름은 표준 용어로 쓴다.** 박스, 텍스트, 버튼이 그 예다.
 7. **화면만 보는 검증을 한다.** 원문을 모르는 역할(볼 사람과 같은 수준 1개 이상)이 컷 그림만 보고 내용을 쓰게 하고 `source.md` 와 대조한다. "코드를 읽지 못해도 이해되는가"를 꼭 묻는다.
@@ -62,7 +62,7 @@
 
 ## 2. 시작하기
 
-1. 폴더를 사용자가 정한 위치에 만든다(예: `motions/<주제>/`). `ui.css` 가 `index.html` 과 같은 폴더에 있어야 하므로 `engine/explainer/` 의 구조를 바꾸지 않는다.
+1. 폴더를 사용자가 정한 위치에 만든다(예: `motions/<주제>/`). `ui.css`(daisyUI 테마)가 `index.html` 과 같은 폴더에 있어야 하므로 `engine/explainer/` 의 구조를 바꾸지 않는다. daisyUI CSS 는 버전을 고정한 CDN 에서 불러오므로 확인과 mp4 내보내기에 네트워크가 필요하다.
 2. 시작 틀에서 엔진을 복사한다. 장면 파일(`s1.js`, `s2.js`)은 시작 틀의 예시 장면이므로 새로 쓴다. 그림 파일(`assets/`)도 새 주제의 것은 codex 로 새로 그린다.
 
 ```bash
@@ -75,11 +75,11 @@ cp $SK/engine/explainer/tools/check.mjs $NEW/tools/
 cp $SK/engine/explainer/scenes/s1.js $SK/engine/explainer/scenes/s2.js $NEW/scenes/   # 장면 파일의 모양을 보고 새로 쓸 때 시작점으로 쓴다
 ```
 
-3. 화면 디자인은 `examples/explainer-demo/` 를 기준으로 한다. 색, 칸 모양, 큰 숫자, 단계 원, 박스 흐름, 끝 화면은 그 예시의 장면 파일에서 가져다 쓰고 새로 디자인하지 않는다.
+3. 화면 디자인은 `examples/explainer-demo/` 를 기준으로 한다. 색, 칸 모양, 큰 숫자, 단계(`steps`), 박스 흐름, 끝 화면은 그 예시의 장면 파일에서 가져다 쓰고 새로 디자인하지 않는다.
 4. 복사한 뒤 바꿀 곳은 아래와 같다. `motion-steps.js` 와 `index.html` 은 `[기능마다]` 표시 부분만 바꾼다.
    - `motion-steps.js`: `FEATURE_ID`, `SCENES`, `STEPS_SRC`, `CAPTIONS`, `CAPTION_OF`, `CAPTION_SCENES`
    - `index.html`: 8행 주석, `ASSET_V`, 장면 파일 목록(`scenes/s1.js` 부터 장면 수만큼), 장면마다 `#scene<n>{--fig-dy:0px}`(장면 안 그림만 아래로 옮기는 값)
-   - 색을 바꾸려면 `scenes/kit.js` 의 `kit.W` 와 `ui.css` 맨 위 `--mx-*` 변수를 함께 바꾼다.
+   - 색을 바꾸려면 `ui.css` 테마(`[data-theme="motionize"]`)의 `--color-*` 변수만 고친다. 네 폴더의 `ui.css` 는 내용이 같아야 한다.
 5. Playwright 는 `<스킬 폴더>/reference/usage.md` 의 Playwright 준비 절을 따라 모션 폴더에 설치한다.
 
 ## 3. 1단계 리서치
@@ -139,7 +139,7 @@ cp $SK/engine/explainer/scenes/s1.js $SK/engine/explainer/scenes/s2.js $NEW/scen
 
 **문장 규칙**
 
-- 한 컷에 자막 1개다. 자막은 화면 아래 한 자리(y 924, 40px 700, 가로 가운데)에 한 줄로 나오고 컷마다 같은 자리에서 바뀐다. 폭은 1640px 안에 들어간다(길면 32px 까지만 줄이고, 그래도 넘치면 문장을 줄인다).
+- 한 컷에 자막 1개다. 자막은 화면 아래 한 자리(위 끝 y 920, 글자 40px 굵게, 가로 가운데)에 한 줄로 나오고 컷마다 같은 자리에서 바뀐다. 폭은 1640px 안에 들어간다(길면 글자 32px 까지만 줄이고, 그래도 넘치면 문장을 줄인다).
 - 주장형 완결 문장으로 쓴다. 주제 이름("컴포넌트")이 아니라 말하려는 결론("이렇게 만든 블록 하나가 컴포넌트입니다")을 쓴다.
 - 컷당 주장은 하나다. "그리고"로 주장 두 개를 잇지 않는다. 두 개이면 컷을 나눈다.
 - 자막만 이어 읽어도 이야기가 되는 순서로 쓴다. 결론이나 정의가 앞에 오고, 근거, 결과, 다음 할 일이 뒤따른다.
@@ -185,7 +185,7 @@ cp $SK/engine/explainer/scenes/s1.js $SK/engine/explainer/scenes/s2.js $NEW/scen
 
 **장면 파일과 엔진**
 
-- 화면 디자인은 `examples/explainer-demo/` 를 기준으로 한다. 색, 칸 모양, 큰 숫자, 단계 원, 박스 흐름, 끝 화면은 그 예시의 장면 파일에서 가져다 쓰고 새로 디자인하지 않는다.
+- 화면 디자인은 `examples/explainer-demo/` 를 기준으로 한다. 색, 칸 모양, 큰 숫자, 단계(`steps`), 박스 흐름, 끝 화면은 그 예시의 장면 파일에서 가져다 쓰고 새로 디자인하지 않는다.
 - 엔진(`index.html`, `motion-steps.js`)이 칩, 장면 전환, 발표 모드, 시간 계산을 맡는다.
 - 장면 파일은 `MotionScenes.register(n, { build, render, rings, measure })` 로 자기 장면의 요소를 만들고 프레임마다 그린다. 계약 전문은 새 폴더의 `CONTRACT.md` 에 있다.
 
@@ -202,12 +202,12 @@ cp $SK/engine/explainer/scenes/s1.js $SK/engine/explainer/scenes/s2.js $NEW/scen
 
 **컷 그림 규칙 (발표 기준)**
 
-- 컷마다 초점은 하나다. 초점은 `kit.FOCUS` 의 밝은 채움(`bg`)과 굵은 테두리(`edge`)로 칠한 한 덩어리이고, 나머지는 `kit.DIM`(0.45) 불투명도나 회색 윤곽으로 둔다. 컷이 바뀔 때 앞 컷의 초점은 DIM 으로 내리거나 사라지게 한다.
-- 초점 색의 뜻은 정해 둔다. blue 는 흐름과 단위, green 은 마침과 반영, yellow 는 남음과 주의다.
+- 컷마다 초점은 하나다. 초점은 초점 색(`blue`, `green`, `yellow`)의 채움이나 테두리로 칠한 한 덩어리이고, 나머지는 `kit.DIM`(0.45) 불투명도나 흰 바탕 윤곽(`base`)으로 둔다. 컷이 바뀔 때 앞 컷의 초점은 DIM 으로 내리거나 사라지게 한다.
+- 초점 색의 뜻은 정해 둔다. blue 는 흐름과 단위, green 은 마침과 반영, yellow 는 남음과 주의다. 값은 `ui.css` 의 `--color-focus-*` 와 `--color-mark-*` 다.
 - 자막 하이라이트는 컷마다 1~2곳이다. 초점 색과 같은 색을 쓴다.
 - 그림 글자는 28px 이상이다. 코드 카드의 코드 글자(22~24px)만 예외다.
 - 그림 글자는 이름과 숫자와 짧은 라벨만 쓴다. 자막의 서술문을 그림에 다시 쓰지 않는다(라벨이 자막 낱말과 같은 것은 괜찮다).
-- 초점 채움 위의 글자와 체크는 `FOCUS` 의 `ink`, 무대 바탕 위의 색 글자와 선은 `text` 를 쓴다.
+- 채움 위의 글자와 체크의 색은 daisyUI 가 정한다(꽉 찬 색 위는 흰색, 옅은 채움 위는 그 색). 무대 바탕 위의 색 글자는 `kit.text` 의 `tone` 으로, 선은 `kit.arrow` 의 `tone` 으로 정한다.
 - 이름표는 가리키는 그림 바로 옆에 둔다. 범례나 번호로 오가며 찾게 하지 않는다.
 - 그림 덩어리는 y 100~880 안에 두고, 아래 끝은 자막 가까이(y 820~870)에 두는 것을 권장한다. 위가 크게 비면 가운데에 둬도 된다.
 - 지워도 주장이 전달되는 그림 요소는 넣지 않는다.
@@ -224,50 +224,49 @@ cp $SK/engine/explainer/scenes/s1.js $SK/engine/explainer/scenes/s2.js $NEW/scen
 
 | 부품                                                                         | 모양과 주요 인자                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `kit.brick`                                                                  | 둥근 몸통과 윗면 돌기가 있는 레고 블록(인자 `x y w h color edge text`, 함수 `el.resize(w, h)`, `el.moveTo(x, y)`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `kit.studs`                                                                  | 요소 윗면에 돌기를 같은 간격으로 놓는다. `kit.studs(el, { fill, edge, k })`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `kit.plate`                                                                  | 옅은 점 격자가 있는 흰 화면 판과 위쪽 화면 이름(인자 `x y w h title`, 크기는 `el.setRect(x, y, w, h, k)`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `kit.nameTag`                                                                | 한글 이름과 작은 영문 이름이 든 태그(인자 `text en tone('gray' 또는 'blue') anchor`, 자리는 `el.put(x, y)`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `kit.banner`, `kit.bannerBlock`, `kit.miniBanner`                            | 배너(`mx-Banner`), 돌기를 추가한 배너 블록, 문구 대신 막대를 둔 작은 배너 블록(인자 `x y` 또는 `cx y`, `s tone text strong w`) |
-| `kit.buttonBlock`                                                            | 버튼(`mx-Button` sm)을 높이 `h` 에 맞춰 확대하고 돌기를 추가한 블록(인자 `x y w h text variant('primary' 또는 'secondary')`) |
-| `kit.radioBlock`, `kit.inputBlock`                                           | 블록 몸통 안에 선택(`mx-Radio`) 3개, 입력(`mx-Textarea`) 필드와 막대를 둔 블록(인자 `x y w h`) |
-| `kit.icon`, `kit.iconSvg`                                                    | 아이콘 SVG 문자열(`kit.icon(name, size)`, `kit.iconSvg(tone, size)`, 이름은 `info`, `check`, `tick`, `warn`. `tick` 은 원 없이 체크 선만 그린다) |
-| `kit.ui`                                                                     | 아래 "UI 조각 그리기" 의 `ui.css` 요소 |
-| `kit.arrow`, `kit.poly`                                                      | 직선 화살표, 꺾은선 화살표(`draw(p)` 로 자람)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `kit.outline`                                                                | 파랑 테두리 강조 사각형                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `kit.progBox`, `kit.sidecarBox`                                              | 프로그램 박스(제목과 작은 글이 가운데, 인자 `x y w h title sub tone`, tone 은 `dark`, `side`, `plain`, `off`, 함수 `el.setTone(tone)`). `kit.sidecarBox` 는 연결 막대 `el.links` 와 바퀴 `el.wheel` 이 더해짐                                                                                                                                                                                                                                                                                                                                                                     |
-| `kit.chunkCard`, `kit.docStack`                                              | 조각 카드(인자 `x y w h kind`)와 종이 3장을 겹친 문서 그룹(인자 `x y w h title sub kind`, 종이는 `el.papers`). kind 는 `blue`(파랑) 또는 `amber`(노랑)                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `kit.img`, `kit.imgReady`                                                    | codex 로 그린 그림 파일을 놓는다. `kit.img(root, { x, y, w, h, src, card = true, pad = 24, radius = 20 })` 이고 `x y w h` 는 카드 전체 자리와 크기, `src` 는 `index.html` 기준 경로(예: `assets/example.png`, `ASSET_V` 가 자동으로 붙음)다. `card: true` 면 흰 카드(테두리 2px)에 비율을 유지해 가운데에 놓고, `false` 면 카드 없이 그림만 놓는다. `el.at(fx, fy)` 는 그림 안 비율 좌표를 무대 좌표로 바꾼다(이름 태그가 가리킬 자리에 쓰고 `measure` 안에서 부른다). `kit.imgReady()` 는 그림을 모두 불러와 decode 한 뒤 끝나는 Promise 이고 하나라도 못 불러오면 실패한다 |
-| `kit.packet`                                                                 | 요청과 응답을 나타내며 이동하는 점(인자 `x y size color`). 만들 때는 숨어 있고 `kit.moveAlong` 이나 `kit.show` 로 보인다                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `kit.tile`                                                                   | 글이 가운데 든 사각형(`alert alert-vertical`). 박스, 칸, 카드, 테두리 강조에 쓴다(인자 `x y w h size text sub icon tone variant('soft', 'outline', 'dash') base`) |
+| `kit.text`, `kit.stat`, `kit.skeleton`, `kit.group`, `kit.view`              | 배경 없는 글, 큰 숫자(`stat`), 회색 막대나 칸(`skeleton`), 같이 움직이는 요소를 담는 빈 요소 |
+| `kit.brick`, `kit.studs`                                                     | 레고 블록(`alert` 위에 돌기 `badge`, 인자 `x y w h tone text size`), 요소 윗면에 돌기를 같은 간격으로 놓는다 |
+| `kit.plate`                                                                  | 화면 판(`mockup-window`)과 위쪽 화면 이름(인자 `x y w h title s`, 크기는 `el.setRect(x, y, w, h, k)`) |
+| `kit.nameTag`                                                                | 한글 이름과 작은 영문 이름이 든 태그(`badge badge-outline`, 인자 `text en tone('gray' 또는 'blue') anchor`, 자리는 `el.put(x, y)`) |
+| `kit.banner`, `kit.bannerBlock`, `kit.miniBanner`                            | 배너(`alert alert-soft`), 돌기를 추가한 배너 블록, 문구 대신 막대를 둔 작은 배너 블록(인자 `x y` 또는 `cx y`, `s tone text strong w`) |
+| `kit.buttonBlock`                                                            | 버튼(`btn` 높이 40)을 높이 `h` 에 맞춰 확대하고 돌기를 추가한 블록(인자 `x y w h text variant('primary' 또는 'secondary')`) |
+| `kit.radioBlock`, `kit.inputBlock`                                           | 블록 몸통 안에 선택(`radio`) 3개, 입력(`textarea`)과 막대를 둔 블록(인자 `x y w h`) |
+| `kit.icon`, `kit.iconSvg`                                                    | 아이콘 SVG 문자열(`kit.icon(name, size)`, `kit.iconSvg(tone, size)`, 이름은 `info`, `check`, `tick`, `warn`. `tick` 은 원 없이 체크 선만 그린다. 색은 부모의 `text-*` 색이다) |
+| `kit.ui`                                                                     | 아래 "UI 조각 그리기" 의 daisyUI 요소 |
+| `kit.arrow`, `kit.poly`                                                      | 직선 화살표, 꺾은선 화살표(`draw(p)` 로 자람, 색은 `tone`) |
+| `kit.progBox`, `kit.sidecarBox`                                              | 프로그램 박스(제목과 작은 글이 가운데, 인자 `x y w h title sub tone`, tone 은 `dark`, `side`, `plain`, `off`, 함수 `el.setTone(tone)`). `kit.sidecarBox` 는 연결 막대 `el.links` 와 바퀴 `el.wheel` 이 더해짐 |
+| `kit.chunkCard`, `kit.docStack`                                              | 조각 카드(인자 `x y w h kind`)와 종이 3장을 겹친 문서 그룹(인자 `x y w h title sub kind`, 종이는 `el.papers`). kind 는 `blue`(info) 또는 `amber`(`--color-amber`) |
+| `kit.img`, `kit.imgReady`                                                    | codex 로 그린 그림 파일을 놓는다. `kit.img(root, { x, y, w, h, src, card = true, pad = 24 })` 이고 `x y w h` 는 카드 전체 자리와 크기, `src` 는 `index.html` 기준 경로(예: `assets/example.png`, `ASSET_V` 가 자동으로 붙음)다. `card: true` 면 흰 카드(`card`)에 비율을 유지해 가운데에 놓고, `false` 면 카드 없이 그림만 놓는다. `el.at(fx, fy)` 는 그림 안 비율 좌표를 무대 좌표로 바꾼다(이름 태그가 가리킬 자리에 쓰고 `measure` 안에서 부른다). `kit.imgReady()` 는 그림을 모두 불러와 decode 한 뒤 끝나는 Promise 이고 하나라도 못 불러오면 실패한다 |
+| `kit.packet`                                                                 | 요청과 응답을 나타내며 이동하는 점(`status`, 인자 `x y size tone`). 만들 때는 숨어 있고 `kit.moveAlong` 이나 `kit.show` 로 보인다 |
 | `kit.uiAsk`, `kit.uiAnswer`, `kit.uiStepRow`, `kit.uiBadge`                  | UI 조각(질문 입력 필드와 버튼, 답변 카드, 단계 행, 배지). 인자는 `x y w s` 와 `text`, `title`, `badges`, `state` 다. `build` 안에서만 만들고 폭과 높이는 `measure` 안에서 `el.fit()` 을 부른 뒤 `el._b` 로 쓴다 |
-| `kit.code`, `kit.codeLines`                                                  | 코드 한 줄, 여러 줄(강조 조각 지정 가능)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `kit.code`                                                                   | 코드 블록(`mockup-code`, 인자 `x y w s lines`) |
 | `kit.sentence`, `kit.captions`, `kit.fitSentence` | 아래 자막 한 줄(`kit.sentence(root, text, line, marks)`), 컷마다 자막 교체(`kit.captions(ctx, s1, id1, s2, id2, s3, id3)`), 한 줄 폭 맞춤과 가로 가운데 |
-| `kit.FOCUS`, `kit.MARK`, `kit.DIM`                                           | 초점 색(`FOCUS.blue`, `green`, `yellow` 의 `bg`, `edge`, `ink`, `text`), 자막 하이라이트 색, 초점이 아닌 것의 불투명도 0.45 |
-| `kit.pose`, `kit.moveAlong`, `kit.appear`, `kit.show`, `kit.prog`, `kit.sub` | 이동, 곡선 이동, 나타남, 불투명도, 단계 진행값 0~1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-
+| `kit.FOCUS`, `kit.DIM`                                                       | 초점 색 이름(`blue`, `green`, `yellow`, 값은 테마의 `--color-focus-*`), 초점이 아닌 것의 불투명도 0.45 |
+| `kit.pose`, `kit.moveAlong`, `kit.appear`, `kit.show`, `kit.prog`, `kit.sub` | 이동, 곡선 이동, 나타남, 불투명도, 단계 진행값 0~1 |
 - 인자와 반환값은 `scenes/kit.js` 의 부품 위 주석과 `CONTRACT.md` 에 있다. 쓰기 전에 읽는다.
 
 **UI 조각 그리기**
 
-- 버튼, 배너, 입력 필드 같은 UI 조각은 직접 그리지 않는다. `kit.ui` 로 `ui.css` 의 컴포넌트를 불러온다.
+- 버튼, 배너, 입력 필드 같은 UI 조각은 직접 그리지 않는다. `kit.ui` 로 daisyUI 컴포넌트를 불러온다.
 - `kit.ui(root, { x, y, w, h, s = 1, html })`
   - `x, y`: 무대 좌표
   - `w, h`: 확대 전 실제 크기(px)
   - `s`: 확대 배율(왼쪽 위 기준)
-  - `html`: `mx-` 클래스로 쓴 마크업
+  - `html`: daisyUI 클래스로 쓴 마크업
 - 돌려주는 요소는 `kit.pose`, `kit.moveAlong`, `kit.show` 로 움직인다. `el._b` 는 `{ x, y, w: w*s, h: h*s }` 다.
 - 요소에 쓰는 함수는 다음과 같다.
   - `el.setHtml(html)`: 마크업을 바꾼다.
   - `el.resize(w, h)`: 확대 전 크기를 바꾼다(돌기가 있으면 다시 놓는다).
   - `el.moveTo(x, y)`: 자리를 바꾼다.
   - `el.natural()`: 마크업의 확대 전 내용 크기 `{w, h}` 를 돌려준다(measure 안에서만 쓴다).
-- 요소 안에 shadow root 를 만들어 `ui.css` 를 불러온다. 무대의 "#stage 안 div 는 모두 position:absolute" 규칙이 마크업에 영향을 주지 않게 하기 위해서다.
+- `index.html` 의 `<head>` 가 daisyUI CSS(버전 고정 CDN)와 `ui.css`(테마)를 이 순서로 불러오고 `<html data-theme="motionize">` 로 테마를 적용한다. 마크업은 요소 안 `.kw` 에 들어가고, 무대의 "#stage 안 div 는 모두 position:absolute" 규칙은 `.kw` 안쪽에 적용되지 않는다.
 - CSS 를 다 불러오기 전에는 프레임을 그리지 않는다(`window.ready` 가 `kit.uiReady()` 를 기다린다). `kit.ui` 와 이 함수를 쓰는 부품은 `build` 안에서만 부른다.
 - 아이콘은 `kit.icon(name, size)` 가 만든 SVG 문자열이다(`display:block`, 이름 `info` `check` `warn`). `kit.iconSvg(tone, size)` 는 tone 의 아이콘 이름으로 `kit.icon` 을 부른다.
 
 ```js
 // 배너 마크업을 직접 쓸 때: 아이콘은 kit.icon(이름, 크기)
-const bannerHtml = `<div class="mx-Banner" data-tone="warning"><span class="mx-Banner__icon">${kit.icon('warn', 20)}</span><div class="mx-Banner__body">텍스트</div></div>`;
+const bannerHtml = `<div class="alert alert-soft alert-warning" role="alert">${kit.icon('warn', 20)}<span>텍스트</span></div>`;
 const raw = kit.ui(root, { x: 480, y: 520, w: 480, h: 49, s: 2, html: bannerHtml });
 
 // 배너는 보통 부품으로 만든다(tone 5가지). 폭은 measure 에서 el.fit() 으로 글 폭에 맞춘다
@@ -280,7 +279,7 @@ const save = kit.buttonBlock(root, { x: 1200, y: 800, w: 120, h: 64, text: '저�
 
 - tone 같은 값을 시간에 따라 바꿀 때는 값이 바뀌는 프레임에만 `setHtml` 을 부른다. 같은 `t` 면 같은 마크업이어야 한다.
 - 글자 크기는 배율이 정한다. 배너와 sm 버튼의 문구는 14px 이라 무대 글자 크기는 14 곱하기 배율이다. 판을 줄여 쓰면(`kit.pose` 의 `s`) 줄인 배율도 곱한다. 배너 문구가 28px 이상(배율 2 이상), 버튼 문구가 28px 이상(블록 높이 80 이상)이 되게 잡고, 저장한 프레임에서 확인한다.
-- 선택과 입력은 `kit.radioBlock`(`mx-Radio` md 를 1.5배로 3개)과 `kit.inputBlock`(`mx-Textarea` 필드)이 블록 몸통 안에 그린다. 몸통 옆 문구는 막대로 줄인다.
+- 선택과 입력은 `kit.radioBlock`(`radio radio-sm` 을 1.5배로 3개)과 `kit.inputBlock`(`textarea`)이 블록 몸통 안에 그린다. 몸통 옆 문구는 막대로 줄인다.
 - 작은 판 안의 배너와 버튼은 `kit.miniBanner`(문구 없는 배너 블록에 막대)와 `text: null` 인 `kit.buttonBlock`(막대는 장면에서 추가)로 그린다. 글자가 없으므로 글자 크기 기준에서 뺀다.
 
 **그림은 codex 로 그린다**
@@ -306,7 +305,7 @@ command codex exec -C "$PWD" --skip-git-repo-check -s workspace-write - < review
 wait
 ```
 
-프롬프트 파일의 첫 줄과 스타일 고정문(색은 `kit.W` 값)은 다음과 같다. 스타일 고정문은 그림마다 글자 그대로 쓴다.
+프롬프트 파일의 첫 줄과 스타일 고정문(색은 `ui.css` 테마 값)은 다음과 같다. 스타일 고정문은 그림마다 글자 그대로 쓴다.
 
 ```text
 Generate ONE image and save it as ./assets/candidates/<이름>.png (PNG, 3:2 landscape aspect, highest resolution available). Output nothing else.
@@ -328,18 +327,18 @@ SUBJECT: <주제문>
 9. `kit.img` 는 `build` 안에서만 만든다. `index.html` 의 `window.ready` 가 `kit.imgReady()` 를 기다리는지 확인하고, 같은 시각의 프레임을 2번 저장해 같은지 비교한다. 그림을 다 불러오기 전에 그리면 프레임이 달라진다.
 10. README 에 그림마다 주제문, 후보 수, 채택 파일을 적는다.
 
-**색 팔레트**
+**색과 스타일**
 
-- `kit` 으로 그리는 도식 요소의 색은 `kit.W` 값만 쓴다. `kit.W` 는 `scenes/kit.js` 에 있고 `ui.css` 맨 위 `--mx-*` 변수와 같은 값이다. 바꿀 때는 둘을 함께 바꾼다.
-- 간격, 모서리, 글자 크기는 `kit.ui` 로 그린 컴포넌트가 정한다. 도식 요소에 그 값이 필요하면 `ui.css` 에서 확인해 `kit.W` 에 추가한다.
-- 장면 파일에서 색 값을 직접 쓰지 않는다. `kit.W` 와 `kit.C` 에 없는 색이 필요하면 `kit.W` 와 `ui.css` 에 추가한다. `kit` 으로 직접 그려도 되는 것은 도식 요소(레고 블록 같은 틀, 화면 판, 이름 태그, 화살표, 막대)뿐이다. 사물이나 비유를 그린 그림은 앞의 "그림은 codex 로 그린다" 대로 codex 로 그린다. 도식 요소도 값은 `kit.W` 와 `kit.C` 만 쓴다.
+- 색은 `ui.css` 의 daisyUI 테마(`[data-theme="motionize"]`) 한 곳에서만 정한다. 장면 파일, `kit`, `index.html` 에 hex 나 rgb 색 값을 쓰지 않는다. 색이 필요하면 daisyUI 색 클래스(`text-success`, `bg-base-100`, `alert-info` 등)나 `var(--color-*)` 로 쓴다.
+- 테두리, 모서리, 그림자, 글자 크기는 컴포넌트가 정한다. 키우려면 `kit` 부품의 `size` 나 `s` 를 쓴다. 배율을 키우면 모서리와 테두리 두께도 같이 커진다.
+- 장면 파일과 `kit` 이 직접 정하는 것은 위치와 크기(`left`, `top`, `width`, `height`), 확대 배율, 움직임(`transform`, `opacity`, `display`)뿐이다. 사물이나 비유를 그린 그림은 앞의 "그림은 codex 로 그린다" 대로 codex 로 그린다.
 
 **코드 카드 규칙**
 
 - 코드는 볼 사람 수준이 허락하는 컷에만 넣는다(수준별 상한은 앞의 판정 표). 코드를 모르는 사람에게는 그림을 다 보인 뒤 1~2컷이다.
 - 그림 아래에 그림보다 작은 카드로 둔다. 코드 글자는 22~24px 이다.
 - 카드마다 한글 제목과 한글 라벨을 붙인다(예: 제목 "HTML 코드", 라벨 "화면마다 태그 3개를 다시 작성"). 코드를 읽지 못해도 그림과 문장만으로 컷의 뜻이 통해야 한다.
-- 코드는 `source.md` 근거 절의 원문 그대로 적고 줄인 부분(class 이름 생략 등)은 README 에 적는다. 화면 텍스트는 `textContent` 로 넣는다(`kit.code` 와 `kit.codeLines` 가 그렇게 한다).
+- 코드는 `source.md` 근거 절의 원문 그대로 적고 줄인 부분(class 이름 생략 등)은 README 에 적는다. 화면 텍스트는 `textContent` 로 넣는다(`kit.code` 가 그렇게 한다).
 - 코드 컷이 아닌 컷에는 코드(꺾쇠 태그, class, CSS, 중괄호, 고정폭 코드 줄)를 쓰지 않는다.
 
 **움직임 규칙**
@@ -356,7 +355,7 @@ SUBJECT: <주제문>
 
 ## 7. 여는 법과 확인
 
-서버는 모션 폴더에서 `127.0.0.1` 로 띄운다. `ui.css` 가 `index.html` 과 같은 폴더에 있어 폴더를 서버 루트로 잡으면 된다.
+서버는 모션 폴더에서 `127.0.0.1` 로 띄운다. `ui.css` 가 `index.html` 과 같은 폴더에 있어 폴더를 서버 루트로 잡으면 된다. daisyUI CSS 는 CDN 에서 받으므로 네트워크가 필요하다.
 
 ```bash
 NEW=<모션 폴더>
@@ -391,7 +390,7 @@ PORT=8990 node tools/check.mjs --steps
 
 **볼 것**
 
-- UI 조각이 실제 모양으로 보이는지(스타일이 빠진 맨 텍스트면 `ui.css` 를 못 불러온 것)
+- UI 조각이 실제 모양으로 보이는지(스타일이 빠진 맨 텍스트면 `ui.css` 나 daisyUI CSS 를 못 불러온 것)
 - 겹침, 넘침, 잘림, 자막 한 줄, 그림 글자 크기(28px 이상)
 - 코드가 정한 컷에만 있는지, 정지 화면만 봐도 뜻이 통하는지
 - 컷마다 초점이 하나이고 나머지가 DIM 이나 회색 윤곽인지, 자막 하이라이트가 1~2곳인지(8절 발표 규칙 확인에서 집계)
@@ -421,7 +420,7 @@ python3 -m http.server <포트> --bind 0.0.0.0 --directory $SHARE
 **발표 규칙 확인**
 
 - 컷마다 자막이 아래 한 줄이고 하이라이트가 1~2곳인지 센다.
-- 컷마다 초점(`FOCUS` 채움) 덩어리가 하나이고 나머지가 DIM 이나 회색 윤곽인지 본다.
+- 컷마다 초점(`blue`, `green`, `yellow` 채움이나 테두리) 덩어리가 하나이고 나머지가 DIM 이나 흰 바탕 윤곽인지 본다.
 - 그림 글자가 28px 이상이고(코드 카드 제외) 자막 서술문을 되풀이하지 않는지 본다.
 - 자막만 차례로 이어 읽어 결론, 근거, 다음 할 일이 이어지는지 읽는다.
 - 마지막 컷에서 한 번 더 누르면 "끝" 화면이 나오고 이전으로 마지막 컷(`n / n`)에 돌아오는지 누른다.
@@ -530,6 +529,6 @@ python3 -m http.server <포트> --bind 0.0.0.0 --directory $SHARE
 - **주제문에 제품 이름, 고객 이름, 내부 정보를 넣지 않는다.** 주제문은 외부 서비스로 나간다.
 - **실제와 다르게 그린 곳은 README 에 적는다.** 비유 그림, 줄여 쓴 코드, 예시 수치, 생략한 블록이 해당하고, "뺀 것과 실제와 다른 점" 절에 적는다.
 - **이어 묻기를 채팅 글로 대신하지 않는다.** 질문 창의 문장만 보고도 어느 모션에 관한 질문인지 알 수 있게 쓴다.
-- **밝은 채움에 DIM 0.28 을 쓰지 않는다.** 밝은 채움이 거의 보이지 않아 0.45(`kit.DIM`)를 쓴다.
-- **밝은 채움 위에 흰 체크를 쓰지 않는다.** 보이지 않으므로 `kit.icon('tick', 크기)` 와 진한 색(`FOCUS` 의 `ink`)을 쓴다.
+- **옅은 채움(`soft`)에 DIM 0.28 을 쓰지 않는다.** 옅은 채움이 거의 보이지 않아 0.45(`kit.DIM`)를 쓴다.
+- **칸 위 체크의 색을 직접 정하지 않는다.** `kit.tile` 의 `icon` 이 칸의 색에 맞춰 정한다(꽉 찬 색 칸은 흰색, 옅은 칸은 그 색).
 
