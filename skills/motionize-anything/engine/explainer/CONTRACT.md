@@ -80,7 +80,7 @@
 | `ctx.T[id].s`, `ctx.T[id].e` | 단계 시작과 끝(기준 초)                                                         |
 
 ```js
-kit.appear(sent1, kit.sub(ctx, 's3_sentence1', 0, 300)); // 문장 나타남 0.3초
+kit.captions(ctx, sent1, 's3_sentence1', sent2, 's3_sentence2', sent3, 's3_sentence3'); // 아래 자막 한 줄이 컷마다 바뀜(문장은 최대 3개)
 ```
 
 ## kit 값
@@ -90,7 +90,7 @@ kit.appear(sent1, kit.sub(ctx, 's3_sentence1', 0, 300)); // 문장 나타남 0.3
 | `kit.C`           | 무대 색 `bg`, `card`, `ink`, `sub`, `line`, `blue`                                                                                                                          |
 | `kit.W`           | 색 팔레트(`ui.css` 의 `--mx-*` 변수와 같은 값. 바꿀 때는 둘을 함께 바꿈) |
 | `kit.F`           | 글꼴 `sans`(Pretendard), `mono`("SF Mono", Menlo)                                                                                                                       |
-| `kit.SENT`        | 문장 자리 `x 120`, 위 문장 `y 114, h 48, 40px 700`, 아래 문장 `y 166, h 44, 34px 600`                                                                                       |
+| `kit.SENT`        | 문장 자리 무대 아래 가운데 한 자리 `y 924, h 52, 40px 700`(1~3번 문장이 모두 같은 자리, 가로는 `fitSentence` 가 가운데에 맞춤). 장면마다 `#scene<n>{--fig-dy}`(그림만 옮기는 값)는 0 |
 | `kit.TONES`       | 배너 tone 5가지(info, neutral, success, warning, error)와 그 아이콘 이름(info, check, warn)                                                                                |
 | `kit.BANNER_TEXT` | 예시 배너 문구                                                                                                                                                              |
 
@@ -112,8 +112,10 @@ kit.appear(sent1, kit.sub(ctx, 's3_sentence1', 0, 300)); // 문장 나타남 0.3
 | `kit.panel(root, o)`                                                                                                    | 다른 요소를 담는 카드                                                                   | `x y w h bg(card) radius(12) border`                                         |
 | `kit.label(root, o)`                                                                                                    | 카드 없는 텍스트                                                                        | `x y h text font('sans') size(28) weight(500) color(sub)`                    |
 | `kit.bar(root, o)`                                                                                                      | 텍스트 대신 쓰는 막대(모서리는 높이의 절반)                                             | `x y w h(20) color(sub)`                                                     |
-| `kit.sentence(root, text, line)`                                                                                        | 문장 자리(`line` 1 은 위 문장, 2 는 아래 문장)                                          |                                                                              |
-| `kit.fitSentence(el, max, min)`                                                                                         | 문장이 한 행(`max` px, 기본 1680)에 들어가도록 크기를 `min` 까지 줄임(measure 안에서만) |                                                                              |
+| `kit.sentence(root, text, line, marks)` | 아래 자막 한 줄(`line` 1~3 은 같은 자리). `marks` 는 `[부분 문자열, 'blue' 또는 'green' 또는 'yellow']` 목록이고 앞에서부터 찾아 하이라이트함(컷마다 1~2곳). `el.t.textContent` 는 원문 그대로 | `marks([])` |
+| `kit.FOCUS`, `kit.MARK`, `kit.DIM` | 초점 색(`FOCUS.blue`, `green`, `yellow` 의 `bg`, `edge`, `ink`, `text`), 자막 하이라이트 색(`MARK`), 초점이 아닌 것의 불투명도(`DIM` 0.45). 채움 위 글자와 체크는 `ink`, 무대 바탕 위 색 글자와 선은 `text`. blue 는 흐름과 단위, green 은 마침과 반영, yellow 는 남음과 주의 | |
+| `kit.captions(ctx, s1, id1, s2, id2, s3, id3)` | 자막 교체. 첫 문장 `s1` 이 나타나고, 다음 컷 움직임이 시작되면 DIM 까지 흐려진 뒤, 다음 문장 단계에서 위로 12px 움직이며 0~150ms 에 사라지고 150~300ms 에 다음 문장이 같은 자리에 나타남. `s2`, `s3` 는 없어도 됨. `render` 에서 매 프레임 부름. `id` 는 `s<n>_sentence<k>` 이고 같은 번호의 `s<n>_read<k>` 단계가 필요함 | `ctx, s1, id1, s2, id2, s3, id3` |
+| `kit.fitSentence(el, max, min)` | 문장이 한 행(`max` px, 기본 1640)에 들어가도록 크기를 `min`(기본 32)까지 줄이고 가로 가운데에 놓음(measure 안에서만) | |
 | `kit.textWidth(text, o)`                                                                                                | 텍스트 폭(px, measure 안에서만)                                                         | `font size weight pre`                                                       |
 | `kit.view(root)`                                                                                                        | 구도 컨테이너(1920x1080). 장면 안 구도 교체에 씀                                        |                                                                              |
 | `kit.row`, `kit.file`, `kit.card`, `kit.slot`, `kit.count`, `kit.tag`, `kit.badge`, `kit.path`, `kit.pr`, `kit.srccard` | 이전 시안에서 쓴 카드와 태그(이 시안은 쓰지 않음)                                       | `kit.js` 주석                                                                |
@@ -137,7 +139,7 @@ kit.appear(sent1, kit.sub(ctx, 's3_sentence1', 0, 300)); // 문장 나타남 0.3
 | `kit.plate(root, o)`      | 점 격자가 있는 흰 화면 판과 위쪽 화면 이름(`el.setRect(x, y, w, h, k)`)                                          | `x y w h title titleSize(28) radius(16)`                                                             |
 | `kit.nameTag(root, o)`    | 한글 이름과 작은 영문 이름이 든 이름 태그(`el.put(기준 x, y)` 로 놓음, measure 안에서 다시 put)                  | `text en tone('gray'\|'blue') size(28) enSize(24) h(46) anchor('c'\|'l'\|'r')`                       |
 | `kit.iconSvg(tone, size)` | tone 의 아이콘 SVG 문자열(문서 안 kit 그림용)                                                                    |                                                                                                      |
-| `kit.icon(name, size)`    | 아이콘 SVG 문자열(`info`, `check`, `warn`, `display:block`)                                                      |                                                                                                      |
+| `kit.icon(name, size)`    | 아이콘 SVG 문자열(`info`, `check`, `tick`, `warn`, `display:block`). `tick` 은 원 없이 체크 선만 그리며 채움 위에서 `FOCUS` 의 `ink` 색으로 씀 | |
 
 ### UI 부품 (ui.css 로 그림)
 
@@ -264,10 +266,10 @@ const b = kit.banner(root, { cx: 960, y: 500, s: 2.4, tone: 'warning' });
 - 칩: `motion-steps.js` 의 `CAPTIONS` 와 칩 시간이 정합니다.
 - 발표 모드: 기본 보기(`?box=1`, `?export=1`, `?embed=1` 이 아닐 때)는 클릭으로 넘깁니다.
   - 정지는 읽는 멈춤마다 있습니다. 종류가 `hold` 인 단계는 [시작, 끝], 종류가 `ring` 인 단계는 테두리가 다 나타난 뒤 유지 구간입니다. 단계 표에서 계산하므로 시간이 바뀌어도 따라갑니다.
-  - 다음(무대 클릭, 오른쪽 화살표, Space, Enter): 정지 안이면 그 정지 끝으로 이동해 다음 움직임을 재생하고, 움직임 중이면 다음 정지 시작으로 이동합니다. 마지막 정지에서는 아무 일도 하지 않습니다.
+  - 다음(무대 클릭, 오른쪽 화살표, Space, Enter): 정지 안이면 그 정지 끝으로 이동해 다음 움직임을 재생하고, 움직임 중이면 다음 정지 시작으로 이동합니다. 마지막 정지에서는 끝 화면(`#endCover`, '끝' 한 글자)을 켭니다. 끝 화면에서 또 눌러도 그대로이고, 이전을 누르면 끝 화면만 걷혀 마지막 컷으로 돌아옵니다. `window.seek` 로 다른 시각에 가면 끝 화면은 풀립니다.
   - 이전(왼쪽 아래 [이전] 버튼, 왼쪽 화살표): 바로 앞 정지 시작으로 이동합니다.
   - 자동 전환은 오른쪽 아래 체크박스를 켰을 때만 동작합니다. `?auto=1` 이면 켠 채로 엽니다.
-  - `?box=1` 과 `?export=1` 은 정지 없이 재생합니다. 세 보기 모두 [이전] 버튼, 자동 전환, 진행 바를 숨깁니다.
+  - `?box=1` 과 `?export=1` 은 정지 없이 재생합니다. 세 보기 모두 [이전] 버튼, 자동 전환, 진행 숫자(`1 / 6` 같은 현재 컷과 전체 컷), 끝 화면을 숨깁니다.
 
 ## 확인 도구
 

@@ -8,7 +8,16 @@
     sub: 'rgb(107,118,132)', line: 'rgb(229,232,235)', blue: 'rgb(31,102,241)',
   };
   const F = { sans: '"Pretendard Variable", Pretendard, -apple-system, sans-serif', mono: '"SF Mono", Menlo, monospace' };
-  const SENT = { x: 120, 1: { y: 114, h: 48, size: 40, weight: 700 }, 2: { y: 166, h: 44, size: 34, weight: 600 } };
+  // 문장 자리: 무대 아래 가운데 한 자리(y 924, 40px 700). 두 문장이 같은 자리에 차례로 나옴(kit.captions). x 는 fitSentence 가 글 폭으로 정함, 여기 x 는 정하기 전 임시값
+  const SENT = { x: 120, 1: { y: 924, h: 52, size: 40, weight: 700 }, 2: { y: 924, h: 52, size: 40, weight: 700 }, 3: { y: 924, h: 52, size: 40, weight: 700 } };
+  // 초점 색: 밝은 채움, 굵은 테두리, 채움 위 글자와 체크(ink), 무대 바탕 위 색 글자와 선(text). blue 흐름과 단위, green 마침과 반영, yellow 남음과 주의
+  const FOCUS = {
+    blue: { bg: '#CFE4F8', edge: '#7EB3E3', ink: '#0F172A', text: '#2D6CB0' },
+    green: { bg: '#D3EEDB', edge: '#7DC495', ink: '#0F172A', text: '#2E7A4C' },
+    yellow: { bg: '#FBE8AE', edge: '#E2B94F', ink: '#0F172A', text: '#8A6914' },
+  };
+  const MARK = { blue: '#D6E8FA', green: '#D5EFDD', yellow: '#FBEAB5' };   // 자막 하이라이트
+  const DIM = 0.45;   // 초점이 아닌 것의 불투명도
   const BD = {
     line: `1px solid ${C.line}`, dash: `2px dashed ${C.sub}`, blue: `2px solid ${C.blue}`, gray2: `2px solid ${C.sub}`,
   };
@@ -21,6 +30,7 @@
 #stage .k-num{font-variant-numeric:tabular-nums;}
 #stage .k-bd{left:0;top:0;width:100%;height:100%;box-sizing:border-box;border-radius:inherit;}
 #stage .k-view{left:0;top:0;width:1920px;height:1080px;}
+#stage .k-mark{border-radius:8px;padding:2px 5px;margin:0 -5px;}
 `;
   document.head.appendChild(css);
 
@@ -134,8 +144,23 @@
     el.t.append(document.createTextNode(text.slice(0, i)), el.hl, document.createTextNode(text.slice(i + hl.length)));
     return el;
   }
-  // 문장 자리: line 1 = 위 문장(y 114, 40px 700), 2 = 아래 문장(y 166, 34px 600)
-  const sentence = (root, text, line = 1) => box(root, { x: SENT.x, ...SENT[line], text, font: 'sans', color: C.ink });
+  // 문장 자리: line 1, 2 모두 같은 자리(y 924, 40px 700, 가로 가운데). 첫 컷은 1, 둘째 컷은 2 가 나옴
+  // marks: [부분 문자열, 'blue' | 'green' | 'yellow'] 목록. 앞에서부터 찾아 .k-mark 로 감싼다. el.t.textContent 는 원문 그대로다
+  function sentence(root, text, line = 1, marks = []) {
+    const el = box(root, { x: SENT.x, ...SENT[line], text, font: 'sans', color: C.ink });
+    el.classList.add('k-sent');
+    let at = 0;
+    if (marks.length) el.t.textContent = '';
+    marks.forEach(([part, tone]) => {
+      const i = text.indexOf(part, at);
+      if (i < 0) { console.error('자막에 없는 하이라이트: ' + part); return; }
+      const span = document.createElement('span');
+      span.className = 'k-mark'; span.textContent = part; span.style.background = MARK[tone];
+      el.t.append(text.slice(at, i), span); at = i + part.length;
+    });
+    if (marks.length) el.t.append(text.slice(at));
+    return el;
+  }
   // 구도: 장면 안에서 통째로 바꾸는 묶음(1920x1080). 장면 안 구도 교체에 쓴다
   function view(root) { const el = document.createElement('div'); el.className = 'k-view'; root.appendChild(el); return el; }
 
@@ -348,10 +373,11 @@
       return Promise.all([400, 500, 600, 700].map(wt => document.fonts.load(`${wt} 16px "Pretendard Variable"`, text)));
     });
   }
-  // 작은 아이콘(info, check, warn). 색은 부모의 color 를 따른다. 문서 안 kit 그림에 쓸 때는 display:block 으로 둔다
+  // 작은 아이콘(info, check, tick, warn). tick 은 원 없이 체크 선만 색은 부모의 color 를 따른다. 문서 안 kit 그림에 쓸 때는 display:block 으로 둔다
   const ICONS = {
     info: '<circle cx="10" cy="10" r="8.5" fill="currentColor"/><path d="M10 9v5M10 6v.01" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>',
     check: '<circle cx="10" cy="10" r="8.5" fill="currentColor"/><path d="M 6.2 10.2 l 2.5 2.5 5 -5.2" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+    tick: '<path d="M 5.2 10.4 l 3.2 3.2 6.4 -6.8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
     warn: '<path d="M10 2.2 18.4 17H1.6z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 7.8v4M10 14.3v.01" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>',
   };
   const icon = (name, size) => `<svg style="display:block" width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true">${ICONS[name]}</svg>`;
@@ -403,6 +429,12 @@
     blue200: '#BFDBFE', // 정보 테두리
     n300: '#94A3B8',
     subtle: '#64748B',  // 보조 글자
+    g50: '#F0FDF4',     // 성공 배경 = ui.css --mx-success-bg
+    g200: '#BBF7D0',    // 성공 테두리 = ui.css --mx-success-bd
+    g600: '#16A34A',    // 성공 = ui.css --mx-success
+    r50: '#FEF2F2',     // 오류 배경 = ui.css --mx-error-bg
+    r200: '#FECACA',    // 오류 테두리 = ui.css --mx-error-bd
+    r700: '#B91C1C',    // 오류 = ui.css --mx-error
   };
   // tone 의 아이콘 그림(경고, 정보, 체크). 색은 부모의 color 를 따른다
   const iconSvg = (tone, size) => icon(TONES[tone || 'warning'].icon, size);
@@ -523,15 +555,30 @@
     };
     return el;
   }
-  // 문장이 한 줄(max px)에 들어가도록 텍스트 크기를 min 까지 줄인다. 돌려주는 값 = 마지막 글 폭
-  function fitSentence(el, max = 1680, min = 36) {
+  // 문장이 한 줄(max px)에 들어가도록 텍스트 크기를 min 까지 줄이고 가로 가운데에 놓는다. 돌려주는 값 = 마지막 글 폭
+  function fitSentence(el, max = 1640, min = 32) {
     let size = parseFloat(el.style.fontSize);
     const text = el.t.textContent, weight = el.style.fontWeight || 700;
     while (size > min && textWidth(text, { size, weight }) > max) size -= 1;
     el.style.fontSize = size + 'px';
-    return textWidth(text, { size, weight });
+    const w = textWidth(text, { size, weight }), x = (1920 - w) / 2;
+    el.style.left = x + 'px'; el._b.x = x;
+    return w;
   }
 
+
+  // 자막: 첫 문장 s1 이 나타나고, 둘째 컷 움직임이 시작되면 DIM 까지 흐려진 뒤, 둘째 컷에서 위로 12px 움직이며 0~150ms 에 사라진 뒤 150~300ms 에 s2 가 같은 자리에 나타남.
+  // s3(셋째 컷)이 있으면 s2 도 같은 규칙으로 s3 에 자리를 내준다. s2, s3 가 없으면 있는 문장만 나옴
+  function captions(ctx, s1, id1, s2, id2, s3, id3) {
+    const list = [[s1, id1], [s2, id2], [s3, id3]].filter(x => x[0]);
+    list.forEach(([el, id], i) => {
+      const nx = list[i + 1];
+      const a = i ? ioC(sub(ctx, id, 150, 150)) : ioC(sub(ctx, id, 0, 300)), out = nx ? ioC(sub(ctx, nx[1], 0, 150)) : 0;
+      // 읽는 멈춤이 끝나 다음 컷 움직임이 시작되면 이 자막은 0~300ms 에 DIM 까지 흐려진다
+      const read = ctx.T[id.replace('sentence', 'read')], d = nx && read ? ioC(seg(ctx.t, read.e, read.e + 0.3)) : 0;
+      pose(el, { dy: 16 * (1 - a) - 12 * out, o: a * (1 - (1 - DIM) * d) * (1 - out) });
+    });
+  }
 
   // ======================= 부품 추가 (프로그램 박스, 조각 카드, 문서 묶음, 그림 카드) =======================
   // kit 이 직접 그리는 모양(프로그램 박스, 조각 카드, 문서 묶음, 점)은 kit.W 값만 쓴다. 사물이나 비유 그림은 그리지 않고 kit.img 로 놓는다
@@ -708,12 +755,12 @@
   }
 
   g.MotionKit = {
-    C, F, SENT,
+    C, F, SENT, FOCUS, MARK, DIM,
     clamp, seg, lerp, ioC, oC, ease, mixColor, prog, sub,
     box, row, file, card, slot, panel, bar, label, count, pr, tag, badge, path, srccard, sentence, view, arrow, code,
     show, pose, appear, center, ctrl, curve, moveAlong, borderTo, slide, swap, baselineOf, alignBaseline,
     textWidth, codeLines, outline, poly, banner, BANNER_TEXT,
-    W, iconSvg, studs, brick, bannerBlock, miniBanner, buttonBlock, radioBlock, inputBlock, nameTag, plate, fitSentence, TONES,
+    W, iconSvg, studs, brick, bannerBlock, miniBanner, buttonBlock, radioBlock, inputBlock, nameTag, plate, fitSentence, captions, TONES,
     ui, uiReady, icon,
     progBox, sidecarBox, chunkCard, docStack, img, imgReady, packet, uiAsk, uiAnswer, uiStepRow, uiBadge, WARN_TEXT,
   };
