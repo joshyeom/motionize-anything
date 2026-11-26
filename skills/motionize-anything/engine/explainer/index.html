@@ -5,7 +5,7 @@
 <title>설명 모션 시작 틀</title>
 <!--
   [공용]     = 사용법 모션 엔진과 같은 틀 (engine/explainer/ 에서 복사)
-  [기능마다] = 이 시작 틀: 장면 2개를 scenes/s1.js, s2.js 가 그린다(블록 조합, 재사용). 화면 조각(배너, 버튼, 입력, 카드, 배지)은 kit.ui 가 ui.css 로 그린다.
+  [기능마다] = 이 시작 틀: 장면 2개를 scenes/s1.js, s2.js 가 그린다(블록 조합, 재사용). 화면 조각(배너, 버튼, 입력, 카드, 배지)은 kit.ui 가 daisyUI 로 그린다.
               이 파일은 장면 컨테이너, 장면 사이 슬라이드, 처음으로 돌아가기, 강조 테두리, 발표 모드(클릭으로 넘기기)를 맡는다.
   계약: CONTRACT.md
 -->
@@ -91,7 +91,7 @@ html.deck:has(#stage.ended),html.deck:has(#stage.ended) body{background:#0F172A;
 <div id="ui"><button id="pp">재생/정지</button><input id="scrub" type="range" min="0" max="1000" step="1" value="0"><span id="tm">0.00 s</span></div>
 <script>
 // [기능마다] 스크립트 버전: 엔진, 장면 파일을 고치면 이 값 하나만 올린다(브라우저 캐시)
-const ASSET_V='2';
+const ASSET_V='3';
 // [기능마다] 장면 등록소. scenes/s<n>.js 가 MotionScenes.register(n, { build(root, kit), render(ctx), rings, measure }) 로 등록한다
 window.MotionScenes={defs:{},register(n,def){this.defs[n]=def;}};
 ['click-fx.js','motion-steps.js','scenes/kit.js','scenes/s1.js','scenes/s2.js']
@@ -316,7 +316,7 @@ addEventListener('keydown',e=>{if(EMBED||DECK)return;   // [기능마다] 발표
 const IMGS=[...Object.values(IMG).map(([u])=>u)];   // [기능마다] 터미널 그림 없음
 window.ready=Promise.all([loadParams(),KIT.uiReady(),KIT.imgReady(),...IMGS.map(u=>{const i=new Image();i.src=u;return i.decode();}),
   document.fonts.load('400 15px "Pretendard Variable"','가나 ab'),document.fonts.load('700 15px "Pretendard Variable"','가나 ab'),document.fonts.ready,
-]).then(r=>{window.paramsSource=r[0];measure();rebuild();draw();if(!EXPORT&&!EMBED)requestAnimationFrame(loop);});   // [기능마다] KIT.uiReady(): ui.css 와 글꼴, KIT.imgReady(): kit.img 그림을 다 불러온 뒤에 재고 그린다
+]).then(r=>{window.paramsSource=r[0];measure();rebuild();draw();if(!EXPORT&&!EMBED)requestAnimationFrame(loop);});   // [기능마다] KIT.uiReady(): daisyUI CSS, ui.css 와 글꼴, KIT.imgReady(): kit.img 그림을 다 불러온 뒤에 재고 그린다
 draw();
 
 // ======================= [기능마다] 발표 모드, 장면 글꼴 미리 불러오기 =======================

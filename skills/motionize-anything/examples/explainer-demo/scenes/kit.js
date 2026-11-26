@@ -308,30 +308,36 @@
     return el;
   }
 
-  // ======================= UI 부품 (플러그인의 ui.css 로 그림) =======================
-  // 버튼, 배너, 입력 필드 같은 화면 조각은 ui.css 의 작은 CSS 변수와 클래스(mx-)로 그린다. CSS 주소는 index.html 기준 상대 경로다.
+  // ======================= UI 부품 (daisyUI 5 로 그림) =======================
+  // 버튼, 배너, 입력 필드 같은 화면 조각은 daisyUI 클래스(alert, btn, radio, input, textarea, card, badge, skeleton)로 그린다.
+  // daisyUI CSS 는 버전을 고정한 CDN 주소이고, 테마(색, 글꼴, 크기)는 ui.css 의 data-theme 하나다. ui.css 주소는 index.html 기준 상대 경로다.
+  const DAISY_CSS = 'https://cdn.jsdelivr.net/npm/daisyui@5.8.2/daisyui.css';
   const UI_CSS = 'ui.css';
+  const UI_THEME = 'motionize';
   const uiLoads = [], uiEls = [];
-  // link 하나를 붙이고 불러오기 완료 약속을 모은다. 못 불러오면 window.ready 가 실패한다(맨 글자 프레임을 저장하지 않게)
+  // daisyUI CSS 와 ui.css 를 이 순서로 link 로 붙이고 불러오기 완료 약속을 모은다(테마 덮어쓰기가 뒤에 와야 한다). 못 불러오면 window.ready 가 실패한다(맨 글자 프레임을 저장하지 않게)
   function uiLink(parent) {
-    const l = document.createElement('link');
-    l.rel = 'stylesheet'; l.href = UI_CSS;
-    uiLoads.push(new Promise((ok, fail) => { l.onload = ok; l.onerror = () => fail(new Error('ui.css 를 불러오지 못함: ' + l.href)); }));
-    parent.appendChild(l);
+    [DAISY_CSS, UI_CSS].forEach(href => {
+      const l = document.createElement('link');
+      l.rel = 'stylesheet'; l.href = href;
+      uiLoads.push(new Promise((ok, fail) => { l.onload = ok; l.onerror = () => fail(new Error(href.split('/').pop() + ' 를 불러오지 못함: ' + l.href)); }));
+      parent.appendChild(l);
+    });
   }
   const UI_HOST_CSS = `
 :host{display:block;}
-.kw{position:absolute;left:0;top:0;transform-origin:0 0;font-family:var(--mx-font-family);font-size:14px;
-  line-height:1.5;color:var(--mx-text);font-weight:400;white-space:normal;text-align:left;
+.kw{position:absolute;left:0;top:0;transform-origin:0 0;font-size:14px;
+  line-height:1.5;font-weight:400;white-space:normal;text-align:left;
   letter-spacing:normal;-webkit-font-smoothing:antialiased;}
 .kw *,.kw *::before,.kw *::after{transition:none!important;animation:none!important;}
 `;
-  // kit.ui(root, { x, y, w, h, s = 1, html }): 무대 좌표 (x, y)에 ui.css 클래스로 쓴 마크업 html 을 그린 요소를 만든다.
+  // kit.ui(root, { x, y, w, h, s = 1, html }): 무대 좌표 (x, y)에 daisyUI 클래스로 쓴 마크업 html 을 그린 요소를 만든다.
   //   w, h 는 확대 전 실제 크기(px), s 는 확대 배율(왼쪽 위 기준). el._b = { x, y, w: w*s, h: h*s }. kit.pose, kit.moveAlong, kit.show 로 움직인다.
   //   el.setHtml(html) = 마크업 교체. el.inner = 마크업을 담은 요소(shadow root 안, scale(s) 적용).
   //   el.resize(w, h) = 확대 전 크기 변경, el.moveTo(x, y) = 자리 변경, el.natural() = 마크업의 확대 전 내용 크기 {w, h}(measure 안에서만).
   //   el 에 직접 붙인 자식(돌기, 테두리, 막대)은 slot 으로 마크업 위에 보인다(좌표는 el 왼쪽 위 기준, 확대하지 않음).
   // 마크업은 shadow root 안에 넣는다. 무대의 「#stage div 는 모두 position:absolute」 규칙이 마크업에 들어가지 않게 하기 위해서다.
+  // shadow root 안에서는 :root 가 맞지 않으므로 마크업을 담는 래퍼(.kw)에 data-theme(ui.css 의 테마)을 붙여 적용한다.
   // 상태 전환(transition)은 끈다. 같은 t 면 같은 그림이어야 하기 때문이다.
   function ui(root, { x, y, w, h, s = 1, html }) {
     const el = document.createElement('div');
@@ -339,7 +345,7 @@
     const sh = el.attachShadow({ mode: 'open' });
     uiLink(sh);
     const style = document.createElement('style'); style.textContent = UI_HOST_CSS;
-    const box = document.createElement('div'); box.className = 'kw';
+    const box = document.createElement('div'); box.className = 'kw'; box.dataset.theme = UI_THEME;
     box.style.transform = s !== 1 ? `scale(${s})` : '';
     sh.append(style, box, document.createElement('slot'));
     el.inner = box; el.s = s;
@@ -366,7 +372,7 @@
     root.appendChild(el); uiEls.push(el);
     return el;
   }
-  // ui.css 를 모두 불러오고 글꼴(Pretendard)까지 불러오면 끝나는 약속. index.html 의 window.ready 가 기다린다
+  // daisyUI CSS 와 ui.css 를 모두 불러오고 글꼴(Pretendard)까지 불러오면 끝나는 약속. index.html 의 window.ready 가 기다린다
   function uiReady() {
     return Promise.all(uiLoads).then(() => {
       const text = uiEls.map(e => e.inner.textContent).join('') + '0123456789';
@@ -383,16 +389,16 @@
   const icon = (name, size) => `<svg style="display:block" width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true">${ICONS[name]}</svg>`;
   const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
-  // 배너: ui.css 의 mx-Banner 마크업(data-tone, mx-Banner__icon, mx-Banner__body)을 kit.ui 로 그린다. s = 1 이 실제 크기(높이 49)
+  // 배너: daisyUI alert(alert-soft 와 tone 클래스, 아이콘과 문구 span)를 kit.ui 로 그린다. s = 1 이 실제 크기(높이 49, ui.css 가 맞춤)
   // o: x y(왼쪽 위) 또는 cx y(가로 가운데), s(2.4), tone('warning'), text, strong(true 면 문구를 <strong> 강조어로), w(무대 px 폭을 정해 줌. 없으면 글 폭에 맞춤)
   // 폭은 measure 에서 el.fit() 으로 정한다. el.setStyle({ radius }) = 모서리 배율(1 = 12px)
   const BANNER_TEXT = '아직 처리하지 않은 항목이 있습니다.';
-  // tone 별 아이콘 이름. error 도 경고 삼각형이다
+  // tone 별 아이콘 이름과 daisyUI alert 색 클래스. error 도 경고 삼각형이다. neutral 은 색 클래스 없이 alert-soft 만 쓴다
   const TONES = {
-    info: { icon: 'info' }, neutral: { icon: 'info' }, success: { icon: 'check' },
-    warning: { icon: 'warn' }, error: { icon: 'warn' },
+    info: { icon: 'info', alert: 'alert-info' }, neutral: { icon: 'info', alert: '' }, success: { icon: 'check', alert: 'alert-success' },
+    warning: { icon: 'warn', alert: 'alert-warning' }, error: { icon: 'warn', alert: 'alert-error' },
   };
-  const bannerHtml = (tone, text, strong) => `<div class="mx-Banner" data-tone="${tone}"><span class="mx-Banner__icon">${icon(TONES[tone].icon, 20)}</span><div class="mx-Banner__body">${text ? (strong ? `<strong>${esc(text)}</strong>` : esc(text)) : '&nbsp;'}</div></div>`;
+  const bannerHtml = (tone, text, strong) => `<div class="alert alert-soft ${TONES[tone].alert}" role="alert">${icon(TONES[tone].icon, 20)}<span>${text ? (strong ? `<strong>${esc(text)}</strong>` : esc(text)) : '&nbsp;'}</span></div>`;
   function banner(root, o) {
     const s = o.s || 2.4, tone = o.tone || 'warning', text = o.text != null ? o.text : BANNER_TEXT, H = 49;
     const w0 = o.w ? o.w / s : 68 + [...text].length * 14 * 0.85;
@@ -407,34 +413,34 @@
 
   // ======================= 공용 요소 추가 (레고 블록 그림) =======================
   // kit 이 직접 그리는 모양(레고 블록, 화면 판, 이름 태그, 선)은 kit.W 와 kit.C 값만 쓴다. 돌기(스터드) 44x14 모서리 6 은 k 배로 줄여 쓴다.
-  // kit.W = 색 팔레트. ui.css 의 --mx-* 변수와 같은 값이다(둘을 함께 바꾼다).
+  // kit.W = 색 팔레트. ui.css 테마(data-theme motionize)의 --color-* 변수와 같은 값이다(둘을 함께 바꾼다).
   const W = {
     y50: '#FFFBEB',    // 노랑 50
     y100: '#FEF3C7',   // 노랑 100
-    y200: '#FDE68A',   // 노랑 200 = 경고 테두리
+    y200: '#FDE68A',   // 노랑 200 = 경고 테두리(--color-warning-line)
     y300: '#FCD34D',   // 노랑 300
     y500: '#F59E0B',   // 노랑 500 = 경고 아이콘
-    y800: '#92400E',   // 노랑 800 = 경고 글자
-    line: '#E2E8F0',   // 기본 테두리
-    strong: '#CBD5E1', // 진한 테두리
-    muted: '#F1F5F9',  // 옅은 배경, 보조 버튼 배경
+    y800: '#92400E',   // 노랑 800 = 경고 글자(--color-warning)
+    line: '#E2E8F0',   // 기본 테두리(--color-base-300)
+    strong: '#CBD5E1', // 진한 테두리(--color-strong)
+    muted: '#F1F5F9',  // 옅은 배경, 보조 버튼 배경(--color-base-200)
     g200: '#D4D4D8',   // 옅은 회색(막대)
-    blue: '#2563EB',   // 파랑 = 정보 아이콘, 강조
-    black: '#000000',  // 기본 버튼 배경
+    blue: '#2563EB',   // 파랑 = 정보 아이콘, 강조(--color-info)
+    black: '#000000',  // 기본 버튼 배경(--color-primary)
     hover: '#1F2937',  // 기본 버튼 호버
-    white: '#FFFFFF',  // 바탕
-    text: '#0F172A',   // 기본 글자
-    blue50: '#EFF6FF',  // 정보 배경
+    white: '#FFFFFF',  // 바탕(--color-base-100)
+    text: '#0F172A',   // 기본 글자(--color-base-content)
+    blue50: '#EFF6FF',  // 정보 배경(--color-info-soft)
     blue100: '#DBEAFE',
-    blue200: '#BFDBFE', // 정보 테두리
+    blue200: '#BFDBFE', // 정보 테두리(--color-info-line)
     n300: '#94A3B8',
-    subtle: '#64748B',  // 보조 글자
-    g50: '#F0FDF4',     // 성공 배경 = ui.css --mx-success-bg
-    g200: '#BBF7D0',    // 성공 테두리 = ui.css --mx-success-bd
-    g600: '#16A34A',    // 성공 = ui.css --mx-success
-    r50: '#FEF2F2',     // 오류 배경 = ui.css --mx-error-bg
-    r200: '#FECACA',    // 오류 테두리 = ui.css --mx-error-bd
-    r700: '#B91C1C',    // 오류 = ui.css --mx-error
+    subtle: '#64748B',  // 보조 글자(--color-neutral)
+    g50: '#F0FDF4',     // 성공 배경 = ui.css --color-success-soft
+    g200: '#BBF7D0',    // 성공 테두리 = ui.css --color-success-line
+    g600: '#16A34A',    // 성공 = ui.css --color-success
+    r50: '#FEF2F2',     // 오류 배경 = ui.css --color-error-soft
+    r200: '#FECACA',    // 오류 테두리 = ui.css --color-error-line
+    r700: '#B91C1C',    // 오류 = ui.css --color-error
   };
   // tone 의 아이콘 그림(경고, 정보, 체크). 색은 부모의 color 를 따른다
   const iconSvg = (tone, size) => icon(TONES[tone || 'warning'].icon, size);
@@ -472,7 +478,7 @@
     el.moveTo = (x, y) => { el._b.x = x; el._b.y = y; el.style.left = x + 'px'; el.style.top = y + 'px'; };
     return el;
   }
-  // 배너 블록: 배너(mx-Banner) 위에 돌기. 폭은 el.fit() 에서 정해지고 돌기도 다시 놓인다(el.resize 가 돌기를 다시 놓음)
+  // 배너 블록: 배너(alert) 위에 돌기. 폭은 el.fit() 에서 정해지고 돌기도 다시 놓인다(el.resize 가 돌기를 다시 놓음)
   function bannerBlock(root, o) {
     const el = banner(root, o);
     studs(el, { fill: o.stud || W.y100, edge: o.edge || W.y200, k: o.k || 1 });
@@ -485,21 +491,21 @@
     el.bar = bar(el, { x: 48 * s, y: (49 * s - 10 * s) / 2, w: (o.w - 68 * s) * 0.85, h: 10 * s, color: W.y800 });
     return el;
   }
-  // 버튼 블록: mx-Button(solid, sm 높이 40)을 높이 h(무대 px)에 맞춰 확대하고 돌기를 얹는다. variant 'primary'(저장) | 'secondary'(취소)
+  // 버튼 블록: daisyUI btn(높이 40)을 높이 h(무대 px)에 맞춰 확대하고 돌기를 얹는다. variant 'primary'(저장) | 'secondary'(취소)
   // o: x y w h(무대 px) text variant k. text 가 null 이면 문구 없는 버튼(작은 그림용, 막대는 장면이 얹는다)
   function buttonBlock(root, o) {
     const sec = o.variant === 'secondary', s = o.h / 40;
-    const html = `<button class="mx-Button" type="button" tabindex="-1" data-style="solid" data-color="${sec ? 'secondary' : 'primary'}" data-size="sm" style="width:100%">${o.text != null ? esc(o.text) : '&nbsp;'}</button>`;
+    const html = `<button class="btn ${sec ? 'btn-secondary' : 'btn-primary'}" type="button" tabindex="-1" style="width:100%">${o.text != null ? esc(o.text) : '&nbsp;'}</button>`;
     const el = ui(root, { x: o.x, y: o.y, w: o.w / s, h: 40, s, html });
     studs(el, { fill: sec ? W.muted : W.black, edge: sec ? W.strong : W.hover, k: o.k || 1 });
     return el;
   }
-  // 선택(Radio) 블록: 블록 몸통(kit) 안에 mx-Radio(md 20px, 1.5 배) 3개와 막대 3개. 첫 번째가 선택(data-value="on")
+  // 선택(Radio) 블록: 블록 몸통(kit) 안에 daisyUI radio(radio-sm 20px, 1.5 배) 3개와 막대 3개. 첫 번째가 선택(checked)
   function radioBlock(root, o) {
     const el = brick(root, { ...o, color: W.muted, edge: W.strong, stud: W.white, text: null });
     const R = 1.5, parts = [];
     for (let i = 0; i < 3; i++) {
-      const radio = ui(el, { x: 0, y: 0, w: 20, h: 20, s: R, html: `<label class="mx-Radio" data-size="md" data-value="${i === 0 ? 'on' : 'off'}" style="display:flex"><span class="mx-Radio__box"><span class="mx-Radio__dot"></span></span></label>` });
+      const radio = ui(el, { x: 0, y: 0, w: 20, h: 20, s: R, html: `<input type="radio" class="radio radio-sm${i === 0 ? ' radio-primary' : ''}" tabindex="-1"${i === 0 ? ' checked' : ''} style="display:block;pointer-events:none">` });
       const line = bar(el, { x: 0, y: 0, w: 100, h: 14, color: W.g200 });
       parts.push({ radio, line });
     }
@@ -514,11 +520,11 @@
     el.onResize(o.w, o.h);
     return el;
   }
-  // 입력(Textarea) 블록: 블록 몸통(kit) 안에 mx-Textarea 필드(높이 89 를 블록 높이 - 32 에 맞춰 줄임)와 옅은 막대 2개
+  // 입력(Textarea) 블록: 블록 몸통(kit) 안에 daisyUI textarea(높이 89 를 블록 높이 - 32 에 맞춰 줄임)와 옅은 막대 2개
   function inputBlock(root, o) {
     const el = brick(root, { ...o, color: W.muted, edge: W.strong, stud: W.white, text: null });
     const FS = (o.h - 32) / 89;
-    const field = ui(el, { x: 18, y: 16, w: (o.w - 36) / FS, h: 89, s: FS, html: '<div class="mx-Field mx-Textarea" data-state="default"><label class="mx-Field__box"><textarea class="mx-Field__value" tabindex="-1" readonly></textarea></label></div>' });
+    const field = ui(el, { x: 18, y: 16, w: (o.w - 36) / FS, h: 89, s: FS, html: '<textarea class="textarea" tabindex="-1" readonly style="display:block;width:100%"></textarea>' });
     const l1 = bar(el, { x: 36, y: 34, w: 0, h: 14, color: W.g200 }), l2 = bar(el, { x: 36, y: 64, w: 0, h: 14, color: W.g200 });
     el.onResize = w => {
       field.resize((w - 36) / FS, 89);
@@ -697,7 +703,7 @@
     return el;
   }
 
-  // ---- ui.css 로 그리는 UI 조각 (기본 배율 1.8: 가장 작은 글자 12px 가 무대 21.6px) ----
+  // ---- daisyUI 로 그리는 UI 조각 (기본 배율 1.8: 가장 작은 글자 12px 가 무대 21.6px) ----
   // 단계 행의 경고 배지 문구
   const WARN_TEXT = '확인이 필요합니다';
   // 고정 폭 w0 에서 마크업 높이를 재어 el.resize 한다(measure 안에서만, 숨은 장면에서도 동작)
@@ -710,44 +716,46 @@
     el.resize(w0, h);
     return el._b;
   }
-  const badgeHtml = (text, tone = 'info', size) => '<span class="mx-Badge" data-variant="subtle" data-color="' + tone + '"' + (size ? ' data-size="' + size + '"' : '') + '>' + esc(text) + '</span>';
-  // 질문 입력: mx-Field mx-TextInput(sm 40)과 [보내기] mx-Button(solid primary sm). w 는 무대 px 폭. el.setText(text) = 입력된 질문 바꾸기
+  // 배지 색 클래스. xs(높이 20)는 daisyUI badge-sm, 기본(높이 24)은 badge. primary 는 검정 채움, 나머지는 옅은 배경(badge-soft)이다. secondary 는 neutral(보조 글자색)을 쓴다
+  const BADGE_TONES = { info: 'badge-soft badge-info', primary: 'badge-primary', secondary: 'badge-soft badge-neutral', positive: 'badge-soft badge-success', cautionary: 'badge-soft badge-warning', negative: 'badge-soft badge-error' };
+  const badgeHtml = (text, tone = 'info', size) => '<span class="badge ' + BADGE_TONES[tone] + (size === 'xs' ? ' badge-sm' : '') + '">' + esc(text) + '</span>';
+  // 질문 입력: daisyUI input(높이 40)과 [보내기] btn btn-primary(높이 40). w 는 무대 px 폭. el.setText(text) = 입력된 질문 바꾸기
   function uiAsk(root, { x, y, w = 760, s = 1.8, text = '', send = '보내기' }) {
     const html = '<div style="display:flex;align-items:center;gap:8px">'
-      + '<div class="mx-Field mx-TextInput" data-size="sm" data-state="default" style="flex:1;min-width:0"><label class="mx-Field__box"><input class="mx-Field__value" type="text" tabindex="-1" readonly value="' + esc(text) + '"></label></div>'
-      + '<button class="mx-Button" type="button" tabindex="-1" data-style="solid" data-color="primary" data-size="sm">' + esc(send) + '</button></div>';
+      + '<label class="input" style="flex:1;min-width:0;width:auto"><input type="text" tabindex="-1" readonly value="' + esc(text) + '"></label>'
+      + '<button class="btn btn-primary" type="button" tabindex="-1">' + esc(send) + '</button></div>';
     const el = ui(root, { x, y, w: w / s, h: 40, s, html });
     el.text = text;
     el.setText = t => { if (t === el.text) return; el.text = t; el.inner.querySelector('input').value = t; };
     el.fit = () => fitHeight(el, w / s);
     return el;
   }
-  // 답변 카드: mx-Card 안에 mx-Card__title(title), 본문 자리 mx-Skeleton 막대 3개, 근거 배지 mx-Badge(badges: 글 또는 { text, tone }, tone 기본 'info')
+  // 답변 카드: daisyUI card 안에 card-title(title), 본문 자리 skeleton 막대 3개, 근거 배지 badge(badges: 글 또는 { text, tone }, tone 기본 'info')
   function uiAnswer(root, { x, y, w = 760, s = 1.8, title = '', badges = [] }) {
-    const bars = '<span class="mx-Skeleton" data-preset="text" style="width:100%"><span class="mx-Skeleton__bar"></span><span class="mx-Skeleton__bar"></span><span class="mx-Skeleton__bar"></span></span>';
+    const bars = '<span style="display:flex;flex-direction:column;gap:8px;width:100%">' + '<span class="skeleton" style="display:block;height:12px"></span>'.repeat(3) + '</span>';
     const tags = badges.map(b => (typeof b === 'string' ? badgeHtml(b) : badgeHtml(b.text, b.tone))).join('');
-    const html = '<div class="mx-Card" style="box-sizing:border-box;width:100%"><span class="mx-Card__title">' + esc(title) + '</span>' + bars
-      + (tags ? '<span style="display:flex;flex-wrap:wrap;gap:6px">' + tags + '</span>' : '') + '</div>';
+    const html = '<div class="card card-border" style="width:100%"><div class="card-body"><span class="card-title">' + esc(title) + '</span>' + bars
+      + (tags ? '<span style="display:flex;flex-wrap:wrap;gap:6px">' + tags + '</span>' : '') + '</div></div>';
     const el = ui(root, { x, y, w: w / s, h: 170, s, html });
     el.fit = () => fitHeight(el, w / s);
     return el;
   }
-  // 단계 한 행: mx-Card(가로 배치)에 상태 표시, 제목(mx-Card__title), state 'warn' 이면 오른쪽 mx-Badge(negative, xs) warnText
-  // 상태 표시: 'wait' = 회색 점 12px(span 에 --mx-strong 색), 'done' 과 'warn' = 체크 아이콘 20(--mx-success 색)
+  // 단계 한 행: card(가로 배치)에 상태 표시, 제목(card-title), state 'warn' 이면 오른쪽 badge(negative, xs) warnText
+  // 상태 표시: 'wait' = 회색 점 12px(span 에 --color-strong 색), 'done' 과 'warn' = 체크 아이콘 20(--color-success 색)
   // el.setState(state) 는 값이 바뀔 때만 마크업을 다시 넣는다
   function uiStepRow(root, { x, y, w = 960, s = 1.8, title = '', state = 'wait', warnText = WARN_TEXT }) {
     const mark = st => st === 'wait'
-      ? '<span style="display:flex;width:20px;height:20px;flex:none;align-items:center;justify-content:center"><span style="width:12px;height:12px;border-radius:9999px;background:var(--mx-strong)"></span></span>'
-      : '<span style="display:flex;width:20px;height:20px;flex:none;align-items:center;justify-content:center;color:var(--mx-success)">' + icon('check', 20) + '</span>';
-    const html = st => '<div class="mx-Card" style="box-sizing:border-box;width:100%;flex-direction:row;align-items:center;gap:12px;padding:16px 20px">'
-      + mark(st) + '<span class="mx-Card__title" style="flex:1;min-width:0">' + esc(title) + '</span>' + (st === 'warn' ? badgeHtml(warnText, 'negative', 'xs') : '') + '</div>';
+      ? '<span style="display:flex;width:20px;height:20px;flex:none;align-items:center;justify-content:center"><span style="width:12px;height:12px;border-radius:9999px;background:var(--color-strong)"></span></span>'
+      : '<span style="display:flex;width:20px;height:20px;flex:none;align-items:center;justify-content:center;color:var(--color-success)">' + icon('check', 20) + '</span>';
+    const html = st => '<div class="card card-border" style="width:100%"><div class="card-body" style="flex-direction:row;align-items:center">'
+      + mark(st) + '<span class="card-title" style="flex:1;min-width:0">' + esc(title) + '</span>' + (st === 'warn' ? badgeHtml(warnText, 'negative', 'xs') : '') + '</div></div>';
     const el = ui(root, { x, y, w: w / s, h: 56, s, html: html(state) });
     el.state = state;
     el.setState = st => { if (st === el.state) return; el.state = st; el.setHtml(html(st)); };
     el.fit = () => fitHeight(el, w / s);
     return el;
   }
-  // 배지 하나: mx-Badge(subtle). tone = data-color('primary' 'secondary' 'positive' 'cautionary' 'negative' 'info'). el.fit() 은 폭과 높이를 글에 맞춘다
+  // 배지 하나: daisyUI badge. tone = 'primary' 'secondary' 'positive' 'cautionary' 'negative' 'info'. el.fit() 은 폭과 높이를 글에 맞춘다
   function uiBadge(root, { x, y, s = 1.8, text = '', tone = 'info' }) {
     const el = ui(root, { x, y, w: 16 + [...text].length * 12, h: 24, s, html: badgeHtml(text, tone) });
     el.fit = () => { const n = el.natural(); el.resize(n.w, n.h); return el._b; };

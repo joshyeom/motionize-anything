@@ -32,7 +32,7 @@ skills/motionize-anything/
   reference/           사용법, 캡처, 엔진, 내보내기, 확인, PR 미리보기, 설명 모션 문서
   scripts/             PR 미리보기 업로드 스크립트
   engine/usage/        사용법 모션 시작 틀
-  engine/explainer/    설명 모션 시작 틀(ui.css 와 scenes/kit.js 포함)
+  engine/explainer/    설명 모션 시작 틀(daisyUI 테마 ui.css 와 scenes/kit.js 포함, daisyUI CSS 는 CDN)
   examples/usage-demo/ 완성 예시(가짜 메모 앱)
 ```
 
@@ -65,6 +65,7 @@ npm i playwright@1.58.2
 ## 필요한 도구
 
 - Node.js 와 npm (Playwright 용)
+- 네트워크 (설명 모션은 daisyUI CSS 를 jsdelivr CDN 에서 불러옵니다. 확인 도구와 mp4 내보내기도 같습니다)
 - ffmpeg (mp4 내보내기용)
 - Python 3 와 Pillow, numpy (기준 프레임 비교용)
 - Aside 브라우저 CLI (화면 캡처와 PR 미리보기 업로드용, 선택)

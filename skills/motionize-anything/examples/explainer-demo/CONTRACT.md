@@ -10,7 +10,7 @@
 | -------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | `index.html`                                                   | 틀(장면 컨테이너, 장면 사이 슬라이드, 칩, 처음으로 돌아가기, 강조 테두리, 발표 모드) |
 | `motion-steps.js`                                              | 단계 표와 시간 계산(단계 길이는 이 파일의 단계 표에서만 바꿈)                        |
-| `scenes/kit.js`, `ui.css`                                      | 공용 부품과 화면 조각 CSS(부품이 모자라면 kit 에 추가하고 이 문서 부품 표에 같이 적음) |
+| `scenes/kit.js`, `ui.css`                                      | 공용 부품과 daisyUI 테마 파일(부품이 모자라면 kit 에 추가하고 이 문서 부품 표에 같이 적음) |
 | `click-fx.js`, `export.mjs`, `baseline.mjs`, `tools/check.mjs` | 엔진과 확인 도구                                                                     |
 
 - 장면 파일은 자기 파일 하나만 고칩니다.
@@ -30,7 +30,7 @@
       /* 요소를 한 번 만든다 */
     },
     measure(kit) {
-      /* 선택. 글꼴과 ui.css 를 불러온 뒤. 텍스트 폭에 따라 정하는 자리 */ ready = true;
+      /* 선택. 글꼴과 daisyUI CSS, ui.css 를 불러온 뒤. 텍스트 폭에 따라 정하는 자리 */ ready = true;
     },
     render(ctx) {
       if (!ready) return; /* 프레임마다 움직이는 스타일을 모두 정한다 */
@@ -43,7 +43,7 @@
 | 키                 | 받는 값                                                                                                              | 하는 일                                                                                                                                       |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `build(root, kit)` | `root`: 이 장면의 컨테이너(무대 전체 1920x1080, 왼쪽 위 0,0), `kit`: 공용 도구                                       | 페이지를 열 때 한 번 불립니다. `kit` 부품 함수로 `root` 안에 요소를 만듭니다                                                                  |
-| `measure(kit)`     | `kit`                                                                                                                | 선택 사항입니다. 글꼴과 `ui.css` 를 다 불러온 뒤 무대 배율 1 에서 불립니다(페이지를 열 때 2번). 텍스트 폭에 따라 정하는 자리만 여기서 정합니다 |
+| `measure(kit)`     | `kit`                                                                                                                | 선택 사항입니다. 글꼴과 daisyUI CSS, `ui.css` 를 다 불러온 뒤 무대 배율 1 에서 불립니다(페이지를 열 때 2번). 텍스트 폭에 따라 정하는 자리만 여기서 정합니다 |
 | `render(ctx)`      | `ctx.t`: 기준 초, `ctx.T`: 단계 id 별 `{s, e, v}`(기준 초, `v` 는 단계 값), `ctx.kit`: 공용 도구, `ctx.n`: 장면 번호 | 장면이 보이는 동안 프레임마다 불립니다                                                                                                        |
 | `rings`            | `[{ step, rect() }]`                                                                                                 | 강조 테두리 대상(`step` 은 ring 단계 id, `rect()` 는 무대 좌표 `{x, y, w, h}`)                                                                |
 
@@ -88,7 +88,7 @@ kit.appear(sent1, kit.sub(ctx, 's3_sentence1', 0, 300)); // 문장 나타남 0.3
 | 이름              | 내용                                                                                                                                                                        |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `kit.C`           | 무대 색 `bg`, `card`, `ink`, `sub`, `line`, `blue`                                                                                                                          |
-| `kit.W`           | 색 팔레트(`ui.css` 의 `--mx-*` 변수와 같은 값. 바꿀 때는 둘을 함께 바꿈) |
+| `kit.W`           | 색 팔레트(`ui.css` 테마의 `--color-*` 변수와 같은 값. 바꿀 때는 둘을 함께 바꿈) |
 | `kit.F`           | 글꼴 `sans`(Pretendard), `mono`("SF Mono", Menlo)                                                                                                                       |
 | `kit.SENT`        | 문장 자리 무대 아래 가운데 한 자리 `y 924, h 52, 40px 700`(위 문장과 아래 문장 모두 같은 자리, 가로는 `fitSentence` 가 가운데에 맞춤). 장면마다 `#scene<n>{--fig-dy}` 는 0                                                                                       |
 | `kit.TONES`       | 배너 tone 5가지(info, neutral, success, warning, error)와 그 아이콘 이름(info, check, warn)                                                                                |
@@ -141,17 +141,17 @@ kit.appear(sent1, kit.sub(ctx, 's3_sentence1', 0, 300)); // 문장 나타남 0.3
 | `kit.iconSvg(tone, size)` | tone 의 아이콘 SVG 문자열(문서 안 kit 그림용)                                                                    |                                                                                                      |
 | `kit.icon(name, size)`    | 아이콘 SVG 문자열(`info`, `check`, `warn`, `display:block`)                                                      |                                                                                                      |
 
-### UI 부품 (ui.css 로 그림)
+### UI 부품 (daisyUI 로 그림)
 
 | 함수                       | 모양                                                                                                                                                                                                      | 주요 인자(기본값)                                                  |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `kit.ui(root, o)`          | 마크업을 `ui.css` 로 그린 요소(아래 kit.ui 절)                                                                                                                                                             | `x y w h s(1) html`                                                |
-| `kit.banner(root, o)`      | `mx-Banner`(`data-tone`, `mx-Banner__icon`, `mx-Banner__body`), 높이 49 를 `s` 배로 확대(`el.fit()` 은 measure 안에서 폭을 텍스트에 맞춤, `el.setStyle({ radius })` 는 모서리 배율이고 1 이 12px)       | `x y` 또는 `cx y`, `s(2.4) tone('warning') text strong w(무대 px)` |
+| `kit.ui(root, o)`          | 마크업을 daisyUI 로 그린 요소(아래 kit.ui 절)                                                                                                                                                             | `x y w h s(1) html`                                                |
+| `kit.banner(root, o)`      | `alert alert-soft`(색은 `alert-info`, `alert-success`, `alert-warning`, `alert-error`, `neutral` 은 색 클래스 없음)에 아이콘과 문구 `span`, 높이 49 를 `s` 배로 확대(`el.fit()` 은 measure 안에서 폭을 텍스트에 맞춤, `el.setStyle({ radius })` 는 모서리 배율이고 1 이 12px)       | `x y` 또는 `cx y`, `s(2.4) tone('warning') text strong w(무대 px)` |
 | `kit.bannerBlock(root, o)` | `banner` 위에 kit 돌기                                                                                                                                                                                    | `banner` 인자와 `stud(W.y100) edge(W.y200) k`                      |
 | `kit.miniBanner(root, o)`  | 문구 없는 `bannerBlock` 위에 문구 대신 막대(`el.bar`)                                                                                                                                                     | `x y w(무대 px) s(1) k`                                            |
-| `kit.buttonBlock(root, o)` | `mx-Button`(solid, sm 높이 40)을 높이 `h` 에 맞춰 확대하고 돌기를 얹음(primary 는 저장, secondary 는 취소, `text` 가 null 이면 문구 없는 버튼)                                                           | `x y w h(무대 px) text variant('primary'\|'secondary') k`          |
-| `kit.radioBlock(root, o)`  | kit 블록 몸통 안에 `mx-Radio`(md 20px, 1.5 배) 3개와 막대 3개(첫 번째가 선택 상태)                                                                                                                       | `x y w h`                                                          |
-| `kit.inputBlock(root, o)`  | kit 블록 몸통 안에 `mx-Textarea` 필드(높이 89 를 `h - 32` 에 맞춰 줄임)와 막대 2개                                                                                                                      | `x y w h`                                                          |
+| `kit.buttonBlock(root, o)` | `btn`(`btn-primary` 또는 `btn-secondary`, 높이 40)을 높이 `h` 에 맞춰 확대하고 돌기를 얹음(primary 는 저장, secondary 는 취소, `text` 가 null 이면 문구 없는 버튼)                                                           | `x y w h(무대 px) text variant('primary'\|'secondary') k`          |
+| `kit.radioBlock(root, o)`  | kit 블록 몸통 안에 `radio radio-sm`(20px, 1.5 배) 3개와 막대 3개(첫 번째가 선택 상태, `radio-primary` 와 `checked`)                                                                                                                       | `x y w h`                                                          |
+| `kit.inputBlock(root, o)`  | kit 블록 몸통 안에 `textarea`(높이 89 를 `h - 32` 에 맞춰 줄임)와 막대 2개                                                                                                                      | `x y w h`                                                          |
 
 ### 도식 부품 (프로그램 박스, 조각 카드, 문서 묶음, 점. kit 이 직접 그림)
 
@@ -177,19 +177,19 @@ kit.appear(sent1, kit.sub(ctx, 's3_sentence1', 0, 300)); // 문장 나타남 0.3
 - `index.html` 의 `window.ready` 가 `kit.uiReady()` 와 함께 `kit.imgReady()` 를 기다린 뒤 `measure` 와 첫 그리기를 합니다. 그래서 `kit.img` 는 `build` 안에서만 부릅니다.
 - `kit.pose(el, { dx, dy, s })` 로 움직인 뒤의 점은 `c = kit.center(el)`, `q = el.at(fx, fy)` 일 때 `[c[0] + (q[0] - c[0]) * s + dx, c[1] + (q[1] - c[1]) * s + dy]` 입니다(pose 는 가운데 기준 확대).
 
-### UI 조각 (ui.css 로 그림)
+### UI 조각 (daisyUI 로 그림)
 
 | 함수                     | 모양                                                                                                                                                                                                                            | 주요 인자(기본값)                                                               |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `kit.uiAsk(root, o)`     | 질문 입력 `mx-Field mx-TextInput`(sm 40)과 `mx-Button`(solid primary sm), `el.setText(text)` 는 값이 바뀔 때만 입력된 질문을 바꿈 | `x y w(760, 무대 px) s(1.8) text send('보내기')` |
-| `kit.uiAnswer(root, o)`  | 답변 카드 `mx-Card`, `mx-Card__title`, 본문 자리 `mx-Skeleton` 막대 3개, 근거 배지 `mx-Badge` | `x y w(760) s(1.8) title badges(글 또는 { text, tone }, tone 기본 'info')` |
-| `kit.uiStepRow(root, o)` | 단계 한 행 `mx-Card`(가로 배치)에 상태 표시, 제목(`mx-Card__title`), `warn` 이면 오른쪽 `mx-Badge`(negative, xs), `el.setState(state)` 는 값이 바뀔 때만 마크업을 다시 넣음(지금 값은 `el.state`) | `x y w(960) s(1.8) title state('wait'\|'done'\|'warn') warnText(kit.WARN_TEXT)` |
-| `kit.uiBadge(root, o)`   | `mx-Badge`(subtle) 하나 | `x y s(1.8) text tone('info')` |
+| `kit.uiAsk(root, o)`     | 질문 입력 `input`(높이 40)과 `btn btn-primary`(높이 40), `el.setText(text)` 는 값이 바뀔 때만 입력된 질문을 바꿈 | `x y w(760, 무대 px) s(1.8) text send('보내기')` |
+| `kit.uiAnswer(root, o)`  | 답변 카드 `card card-border`(`card-body`, `card-title`), 본문 자리 `skeleton` 막대 3개, 근거 배지 `badge` | `x y w(760) s(1.8) title badges(글 또는 { text, tone }, tone 기본 'info')` |
+| `kit.uiStepRow(root, o)` | 단계 한 행 `card card-border`(가로 배치)에 상태 표시, 제목(`card-title`), `warn` 이면 오른쪽 `badge`(negative, 높이 20 인 `badge-sm`), `el.setState(state)` 는 값이 바뀔 때만 마크업을 다시 넣음(지금 값은 `el.state`) | `x y w(960) s(1.8) title state('wait'\|'done'\|'warn') warnText(kit.WARN_TEXT)` |
+| `kit.uiBadge(root, o)`   | `badge`(옅은 배경 `badge-soft`) 하나 | `x y s(1.8) text tone('info')` |
 
 - 배율 `s` 기본 1.8 은 가장 작은 글자(12px)가 무대 21.6px 가 되는 값입니다.
-- `tone` 은 배지의 `data-color` 값 `primary`, `secondary`, `positive`, `cautionary`, `negative`, `info` 입니다. 파랑 조각에는 `info`, 노랑 조각에는 `cautionary` 를 쓰면 조각 카드 색과 맞습니다.
+- `tone` 은 `primary`(`badge-primary`), `secondary`(`badge-soft badge-neutral`), `positive`(`badge-success`), `cautionary`(`badge-warning`), `negative`(`badge-error`), `info`(`badge-info`) 입니다. `positive` 부터 `info` 까지는 `badge-soft` 와 함께 씁니다. 파랑 조각에는 `info`, 노랑 조각에는 `cautionary` 를 쓰면 조각 카드 색과 맞습니다.
 - 네 부품 모두 `el.fit()` 이 있습니다. measure 안에서 부른 뒤 `el._b` 를 씁니다. `uiAsk`, `uiAnswer`, `uiStepRow` 는 폭을 `w` 로 두고 그 폭에서 높이를 재고, `uiBadge` 는 `el.natural()` 로 폭과 높이를 텍스트에 맞춥니다.
-- `uiStepRow` 상태 표시: `wait` 는 회색 점(span 에 `--mx-strong` 색), `done` 과 `warn` 은 체크 아이콘(`--mx-success` 색)입니다.
+- `uiStepRow` 상태 표시: `wait` 는 회색 점(span 에 `--color-strong` 색), `done` 과 `warn` 은 체크 아이콘(`--color-success` 색)입니다.
 - `kit.WARN_TEXT` 는 단계 행 경고 배지의 기본 문구 "확인이 필요합니다" 입니다. `warnText` 로 바꿉니다.
 
 ## kit.ui
@@ -198,7 +198,7 @@ kit.appear(sent1, kit.sub(ctx, 's3_sentence1', 0, 300)); // 문장 나타남 0.3
 const el = kit.ui(root, { x, y, w, h, s: 1, html });
 ```
 
-- 무대 좌표 `(x, y)` 에 마크업 `html` 을 `ui.css` 로 그린 요소를 만듭니다.
+- 무대 좌표 `(x, y)` 에 마크업 `html` 을 daisyUI 클래스로 그린 요소를 만듭니다.
 - `w, h` 는 확대 전 실제 크기(px), `s` 는 확대 배율(왼쪽 위 기준, 생략하면 1)입니다. `el._b = { x, y, w: w*s, h: h*s }` 입니다.
 - 돌려준 요소는 다른 부품처럼 `kit.pose`, `kit.moveAlong`, `kit.show` 로 움직입니다.
 - `el.setHtml(html)` 로 마크업을 바꿉니다.
@@ -213,15 +213,18 @@ const el = kit.ui(root, { x, y, w, h, s: 1, html });
 
 **구현**
 
-- 요소 안에 shadow root 를 만들고 `link rel=stylesheet` 로 `ui.css` 를 불러온 뒤 마크업을 넣습니다. 무대의 `#stage div` 규칙이 마크업에 들어가지 않게 하기 위해서입니다.
-- CSS 주소는 `index.html` 기준 상대 경로 `ui.css` 입니다. `ui.css` 는 `index.html` 과 같은 폴더에 둡니다.
-- 색과 글꼴은 `ui.css` 맨 위 `:host` 의 `--mx-*` 변수 한 곳에 있습니다. `kit.W` 와 같은 값이므로 바꿀 때 둘을 함께 바꿉니다.
+- 요소 안에 shadow root 를 만들고 `link rel=stylesheet` 로 daisyUI CSS 와 `ui.css` 를 이 순서로 불러온 뒤 마크업을 넣습니다. 무대의 `#stage div` 규칙이 마크업에 들어가지 않게 하기 위해서입니다.
+- daisyUI CSS 는 버전을 고정한 CDN 주소(`https://cdn.jsdelivr.net/npm/daisyui@5.8.2/daisyui.css`)입니다. 불러오려면 네트워크가 필요하고, 확인 도구와 mp4 내보내기도 같습니다.
+- `ui.css` 는 `index.html` 기준 상대 경로이고 `index.html` 과 같은 폴더에 둡니다. daisyUI 테마 `motionize` 한 개가 들어 있습니다.
+- shadow root 안에서는 `:root` 가 맞지 않으므로 마크업을 담는 래퍼(`.kw`)에 `data-theme="motionize"` 를 붙여 테마를 적용합니다.
+- 색과 글꼴은 `ui.css` 의 `[data-theme="motionize"]` 블록 한 곳에 daisyUI 변수(`--color-base-100`, `--color-primary`, `--color-info` 등)로 있습니다. `kit.W` 와 같은 값이므로 바꿀 때 둘을 함께 바꿉니다.
+- 장면 배치가 쓰는 고정 크기는 배너 49, 버튼 40, 라디오 20, 입력 40, 텍스트 영역 89, 배지 24 와 20 입니다. daisyUI 기본값과 다른 크기는 `ui.css` 아래쪽의 덮어쓰기가 맞춥니다.
 - 상태 전환(transition)과 애니메이션은 shadow root 안에서 끕니다.
 - `el` 에 직접 붙인 자식(돌기, 테두리, 막대)은 slot 으로 마크업 위에 보입니다. 좌표는 `el` 왼쪽 위 기준이고 `s` 배로 확대되지 않습니다.
 
 **불러오기 완료**
 
-- kit 은 CSS 불러오기 완료 약속(Promise)을 모아 둡니다. `kit.uiReady()` 는 CSS 를 다 불러오고 마크업이 쓰는 Pretendard 글꼴(400, 500, 600, 700)을 불러오면 끝납니다.
+- kit 은 CSS 불러오기 완료 약속(Promise)을 모아 둡니다. `kit.uiReady()` 는 daisyUI CSS 와 `ui.css` 를 다 불러오고 마크업이 쓰는 Pretendard 글꼴(400, 500, 600, 700)을 불러오면 끝납니다.
 - `index.html` 의 `window.ready` 가 `kit.uiReady()` 를 기다린 뒤 `measure` 와 첫 그리기를 합니다. CSS 를 못 불러오면 `window.ready` 가 실패해 확인 도구가 멈춥니다(스타일 없는 프레임을 저장하지 않게).
 - `kit.ui` 는 `build` 안에서만 부릅니다. `build` 뒤에 만든 요소의 CSS 는 `window.ready` 가 기다리지 않습니다.
 
@@ -232,7 +235,7 @@ kit.ui(root, {
   y: 300,
   w: 120,
   h: 40,
-  html: '<button class="mx-Button" type="button" data-style="solid" data-color="primary" data-size="sm" style="width:100%">저장</button>',
+  html: '<button class="btn btn-primary" type="button" style="width:100%">저장</button>',
 });
 // 배너(2.4 배, 폭은 measure 에서 el.fit())
 const b = kit.banner(root, { cx: 960, y: 500, s: 2.4, tone: 'warning' });
@@ -299,7 +302,7 @@ PORT=8993 node tools/check.mjs --times 2.7,6.7 --out /tmp/motion-qa
 - 늘 출력하는 값: 콘솔 오류, 페이지 오류, `DURATION`, 칩마다 폭과 넘침 여부(그 장면의 첫 hold 단계 시작 0.5초 뒤에 측정).
 - `motion-params.json` 404 콘솔 오류 1건은 정상입니다(값 파일이 없어 기본값을 씁니다). `--box` 를 주면 1건이 더 나옵니다.
 - 마지막 행은 결과 JSON 한 덩어리입니다.
-- 저장한 PNG 는 직접 열어 위치, 텍스트, 넘침, 겹침을 확인합니다. 화면 조각이 스타일 없는 텍스트로 보이면 `ui.css` 를 못 불러온 것입니다(서버 루트와 `BASE_PATH` 확인).
+- 저장한 PNG 는 직접 열어 위치, 텍스트, 넘침, 겹침을 확인합니다. 화면 조각이 스타일 없는 텍스트로 보이면 `ui.css` 나 daisyUI CSS 를 못 불러온 것입니다(서버 루트, `BASE_PATH`, 네트워크 확인).
 - `export.mjs`(mp4 내보내기)는 위 표의 `PORT`, `BASE_PATH`, `PW_ROOT` 를 같은 뜻으로 받습니다. 첫 인자는 화질 값 crf(기본 16)이고, mp4 는 이 폴더에 저장합니다. `NAME` 은 파일 이름 앞부분(기본은 폴더 이름), `LIMIT` 은 앞에서부터 그릴 프레임 수(테스트용)입니다.
 - `baseline.mjs`(기준 프레임 찍기)는 출력 폴더와 포트를 인자로 받습니다(포트 기본 8947). `PORT` 환경 값은 읽지 않습니다. `BASE_PATH`, `PW_ROOT` 는 환경 값으로 받습니다.
 
