@@ -75,11 +75,12 @@ cp $SK/engine/explainer/tools/check.mjs $NEW/tools/
 cp $SK/engine/explainer/scenes/s1.js $SK/engine/explainer/scenes/s2.js $NEW/scenes/   # 장면 파일의 모양을 보고 새로 쓸 때 시작점으로 쓴다
 ```
 
-3. 복사한 뒤 바꿀 곳은 아래와 같다. `motion-steps.js` 와 `index.html` 은 `[기능마다]` 표시 부분만 바꾼다.
+3. 화면 디자인은 `examples/explainer-demo/` 를 기준으로 한다. 색, 칸 모양, 큰 숫자, 단계 원, 박스 흐름, 끝 화면은 그 예시의 장면 파일에서 가져다 쓰고 새로 디자인하지 않는다.
+4. 복사한 뒤 바꿀 곳은 아래와 같다. `motion-steps.js` 와 `index.html` 은 `[기능마다]` 표시 부분만 바꾼다.
    - `motion-steps.js`: `FEATURE_ID`, `SCENES`, `STEPS_SRC`, `CAPTIONS`, `CAPTION_OF`, `CAPTION_SCENES`
    - `index.html`: 8행 주석, `ASSET_V`, 장면 파일 목록(`scenes/s1.js` 부터 장면 수만큼), 장면마다 `#scene<n>{--fig-dy:0px}`(장면 안 그림만 아래로 옮기는 값)
    - 색을 바꾸려면 `scenes/kit.js` 의 `kit.W` 와 `ui.css` 맨 위 `--mx-*` 변수를 함께 바꾼다.
-4. Playwright 는 `<스킬 폴더>/reference/usage.md` 의 Playwright 준비 절을 따라 모션 폴더에 설치한다.
+5. Playwright 는 `<스킬 폴더>/reference/usage.md` 의 Playwright 준비 절을 따라 모션 폴더에 설치한다.
 
 ## 3. 1단계 리서치
 
@@ -184,6 +185,7 @@ cp $SK/engine/explainer/scenes/s1.js $SK/engine/explainer/scenes/s2.js $NEW/scen
 
 **장면 파일과 엔진**
 
+- 화면 디자인은 `examples/explainer-demo/` 를 기준으로 한다. 색, 칸 모양, 큰 숫자, 단계 원, 박스 흐름, 끝 화면은 그 예시의 장면 파일에서 가져다 쓰고 새로 디자인하지 않는다.
 - 엔진(`index.html`, `motion-steps.js`)이 칩, 장면 전환, 발표 모드, 시간 계산을 맡는다.
 - 장면 파일은 `MotionScenes.register(n, { build, render, rings, measure })` 로 자기 장면의 요소를 만들고 프레임마다 그린다. 계약 전문은 새 폴더의 `CONTRACT.md` 에 있다.
 

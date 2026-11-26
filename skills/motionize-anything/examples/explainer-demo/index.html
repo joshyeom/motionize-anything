@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>문서 검색 도구 진행 상황</title>
+<!--
+  [공용]     = 사용법 모션 엔진과 같은 틀 (engine/explainer/ 에서 복사)
+  [기능마다] = 문서 검색 도구 진행 상황(가상 예시): 장면 5개를 scenes/s1.js ~ s5.js 가 그린다(지금, 하는 일, 실제 실행, 검색 화면, 남은 것). 화면 조각(배지, 카드, 단계 행, 배너)은 kit.ui 가 ui.css 로 그린다.
+              이 파일은 장면 컨테이너, 장면 사이 슬라이드, 처음으로 돌아가기, 강조 테두리, 발표 모드(클릭으로 넘기기)를 맡는다.
+  계약: CONTRACT.md
+-->
+<style>
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+/* [공용] 무대, 보기 방식 */
+html,body{margin:0;background:#ddd;font-family:Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;}
+body.box{background:#fff;}
+body.export{background:#f2f4f6;}
+#wrap{position:relative;margin:20px auto 0;overflow:hidden;}
+body.box #wrap{border-radius:32px;margin-top:40px;}
+body.export #wrap{margin:0;}
+body.export #ui{display:none;}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;background:#f2f4f6;overflow:hidden;}
+#stage div{position:absolute;}
+#stage .capBig div,#stage .chip div,#stage .fl div,#stage .fl span{position:static;}
+.img{background-repeat:no-repeat;}
+.shadow{box-shadow:0 12px 40px rgba(0,0,0,.08);}
+/* [공용] 단계 문구: 칩(PC). 번호 칸 파랑 #4F6CAA */
+.chip{left:960px;top:17px;height:56px;display:flex;align-items:center;gap:12px;padding:0 28px 0 8px;background:#fff;border-radius:28px;white-space:nowrap;box-shadow:0 12px 40px rgba(0,0,0,.08);}
+.chip b{width:40px;height:40px;border-radius:20px;background:#CFE4F8;color:#2D6CB0;font-size:19px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.chip .role{font-size:27px;font-weight:600;color:#666;}
+.chip .role:empty{display:none;}
+.chip .ttl{font-size:29px;font-weight:800;color:#000;letter-spacing:-.02em;}
+/* [공용] 클릭 효과, 커서 */
+#fx{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;}
+#cursor{position:absolute;left:0;top:0;width:30px;height:44px;overflow:visible;filter:drop-shadow(0 2px 3px rgba(0,0,0,.28));transform-origin:2px 2px;}
+.dot{width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:rgba(0,0,0,.28);box-shadow:0 0 0 2px #fff inset;}
+#ui{display:flex;align-items:center;gap:12px;margin:14px auto;font:13px/1 ui-monospace,Menlo,monospace;color:#000;}
+#ui input{flex:1;}
+#ui button{font:inherit;padding:4px 10px;}
+[contenteditable]{outline:none;caret-color:#3182f3;}
+
+
+/* ======================= [기능마다] 화면 배치 ======================= */
+/* 장면마다 컨테이너 하나(무대 전체 1920x1080). 부품 CSS 는 scenes/kit.js 가 넣는다 */
+#scenes,.scene{left:0;top:0;width:1920px;height:1080px;}
+/* [기능마다] 발표 모드: 기본 보기 페이지(?box=1, ?export=1, ?embed=1 은 바꾸기 전 엔진 그대로). 무대 밖 조작 영역은 숨기고 DOM 은 남긴다 */
+html.deck,html.deck body{background:#f2f4f6;}
+html.deck body{overflow:hidden;}
+html.deck #wrap{margin:0 auto;}
+html.deck #ui{display:none;}
+/* [기능마다] 발표 모드: 무대 안 조작 요소(기준 무대 좌표, 무대 배율을 따른다). 좌우 위치 = 장면 내용 여백 120 */
+html.deck #stage{cursor:pointer;user-select:none;-webkit-user-select:none;}
+html:not(.deck) #prev,html:not(.deck) #autoLbl,html:not(.deck) #stage #prog,html:not(.deck) #endCover{display:none;}
+/* 끝 화면: 마지막 컷에서 한 번 더 누르면 켠다. 발표 모드 UI 라 transition 을 쓴다. #prev 와 #prog 는 끝 화면 위에 보인다 */
+#endCover{left:0;top:0;width:1920px;height:1080px;background:#0F172A;color:#fff;display:flex;flex-direction:column;gap:36px;align-items:center;justify-content:center;font:800 88px "Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;opacity:0;visibility:hidden;transition:opacity .25s,visibility 0s .25s;}
+#endCover>div{position:static;}
+#stage.ended #endCover{opacity:1;visibility:visible;transition:opacity .25s;}
+#stage.ended{background:#0F172A;}
+#stage.ended #prog{color:#fff;}
+html.deck:has(#stage.ended),html.deck:has(#stage.ended) body{background:#0F172A;}
+#stage.ended #autoLbl{display:none;}
+/* 문장(.k-sent)은 무대 아래 고정, 그림은 장면마다 --fig-dy 만큼 옮긴다(장면의 마지막 컷에서 그림 아래 끝이 y 860) */
+.scene > :not(.k-sent){translate:0 var(--fig-dy,0px);}
+#scene1{--fig-dy:0px}#scene2{--fig-dy:0px}#scene3{--fig-dy:0px}#scene4{--fig-dy:0px}#scene5{--fig-dy:0px}#scene6{--fig-dy:0px}#scene7{--fig-dy:0px}
+#prev{position:absolute;left:120px;bottom:14px;height:44px;padding:0 20px;box-sizing:border-box;border:0;border-radius:22px;background:#fff;display:flex;align-items:center;gap:8px;font:700 20px "Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;color:#333d4b;cursor:pointer;-webkit-appearance:none;appearance:none;}
+#prev:hover:not(:disabled){background:#e5e8eb;}
+#prev:disabled{opacity:.35;cursor:default;}
+#prev svg{flex:none;width:16px;height:16px;}
+#autoLbl{position:absolute;right:120px;bottom:14px;height:44px;display:flex;align-items:center;gap:10px;font:500 20px "Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;color:#6b7684;cursor:pointer;}
+#autoLbl input{margin:0;width:20px;height:20px;accent-color:#7EB3E3;cursor:pointer;}
+#prog{position:absolute;right:120px;top:17px;height:56px;display:flex;align-items:center;font:600 24px "Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;font-variant-numeric:tabular-nums;color:#6b7684;}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage">
+  <!-- [기능마다] 장면 컨테이너(#scene1 ~ #scene<장면 수>)를 스크립트가 이 안에 만든다 -->
+  <div id="scenes"></div>
+  <!-- [공용] 효과 층 (순서 유지: 효과 → 문구 → 커서) -->
+  <div id="fxDiv" style="inset:0;pointer-events:none"></div>
+  <svg id="fx" width="1920" height="1080" viewBox="0 0 1920 1080"></svg>
+  <div id="curDisc" style="border-radius:50%;background:rgba(237,255,0,.35);display:none"></div>
+  <!-- [공용 구조] 단계 문구 칩: MotionSteps.CAPTIONS 로 buildScenes 가 만든다. id="cap<n>", <b>번호</b><span class="role"><span class="ttl"> -->
+  <div id="dots"></div>
+  <svg id="cursor" viewBox="0 0 15 22"><path d="M1 1 L1 17.6 L5.1 13.7 L7.9 20.2 L10.7 19 L7.9 12.7 L13.5 12.7 Z" fill="#000" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg>
+  <!-- [기능마다] 발표 모드: 이전 버튼, 자동 전환, 진행 숫자(현재 컷 / 전체 컷) -->
+  <div id="endCover"><div>끝</div></div>
+  <button type="button" id="prev"><svg viewBox="0 0 16 16" fill="none" stroke="#333d4b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="10,2.5 4.5,8 10,13.5"/></svg>이전</button>
+  <label id="autoLbl"><input type="checkbox" id="auto" /><span>자동 전환</span></label>
+  <div id="prog"></div>
+</div></div>
+<div id="ui"><button id="pp">재생/정지</button><input id="scrub" type="range" min="0" max="1000" step="1" value="0"><span id="tm">0.00 s</span></div>
+<script>
+// [기능마다] 스크립트 버전: 엔진, 장면 파일을 고치면 이 값 하나만 올린다(브라우저 캐시)
+const ASSET_V='28';
+// [기능마다] 장면 등록소. scenes/s<n>.js 가 MotionScenes.register(n, { build(root, kit), render(ctx), rings, measure }) 로 등록한다
+window.MotionScenes={defs:{},register(n,def){this.defs[n]=def;}};
+['click-fx.js','motion-steps.js','scenes/kit.js','scenes/s1.js','scenes/s2.js','scenes/s3.js','scenes/s4.js','scenes/s5.js']
+  .forEach(f=>document.write(`<script src="${f}?v=${ASSET_V}"><\/script>`));
+</script>
+<script>
+// ======================= [기능마다] 데이터 =======================
+const IMG={};   // 캡처 그림 없음(장면은 scenes/ 가 HTML 로 그린다)
+const KIT=window.MotionKit;
+
+
+// ======================= [공용] 수학, 도구 =======================
+const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
+const seg=(t,a,b)=>b<=a?(t>=b?1:0):clamp((t-a)/(b-a));
+const ioC=p=>p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+const oC=p=>1-Math.pow(1-p,3);
+const lerp=(a,b,p)=>a+(b-a)*p;
+const $=id=>document.getElementById(id);
+function bez(p){const x1=.3,y1=0,x2=.12,y2=1;let lo=0,hi=1,u=p;for(let i=0;i<24;i++){u=(lo+hi)/2;const x=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u;if(x<p)lo=u;else hi=u;}return 3*(1-u)*(1-u)*u*y1+3*(1-u)*u*u*y2+u*u*u;}
+function patch(el,key,src,dst){const [url,W,H]=IMG[key],sx=dst.w/src.w,sy=dst.h/src.h,st=el.style;
+  st.backgroundImage=`url(${url})`;st.left=dst.x+'px';st.top=dst.y+'px';st.width=dst.w+'px';st.height=dst.h+'px';st.backgroundSize=`${W*sx}px ${H*sy}px`;st.backgroundPosition=`${-src.x*sx}px ${-src.y*sy}px`;}
+const full=(el,key,x=0,y=0)=>{const [,W,H]=IMG[key];patch(el,key,{x:0,y:0,w:W,h:H},{x,y,w:W,h:H});};
+function show(el,o){el.style.opacity=o;el.style.display=o<=0.001?'none':'';}
+const ctr=b=>[b.x+b.w/2,b.y+b.h/2];
+const NS='http://www.w3.org/2000/svg',fx=$('fx');
+const mk=(tag,a,p=fx)=>{const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e;};
+const place=(el,b)=>{Object.assign(el.style,{left:b.x+'px',top:b.y+'px',width:b.w+'px',height:b.h+'px'});};
+const typed=(ts,t)=>{let n=0;if(ts)while(n<ts.length&&ts[n]<=t)n++;return n;};
+
+// ======================= [공용] 값 =======================
+const q=new URLSearchParams(location.search);
+const LOCAL=q.get('params')==='local';
+let P=MotionSteps.defaults(),CP=ClickFX.defaults();
+let T,BASE,DURATION,SPEED,VARIANT,FXP;
+
+// ======================= [기능마다] 장면 컨테이너, 장면 사이 슬라이드, 처음으로 돌아가기 =======================
+// 장면 n 은 자기 단계가 끝나면 다음 장면의 trans 단계(장면 7 은 loop 단계)에서 나간다. 들어올 때는 자기 첫 trans 단계.
+// 장면 1 은 0초부터 보이고, loop 단계에서 다시 들어온다. 그때 장면 1 은 ctx.t = 0(첫 화면)으로 그린다.
+const SC={};   // 장면 번호 → {n, el, def, inId, outId, reId, s, e, holdId}
+(function buildScenes(){
+  const defs=window.MotionScenes.defs;
+  MotionSteps.SCENES.forEach(({id:n})=>{
+    const el=document.createElement('div');el.id='scene'+n;el.className='scene';$('scenes').appendChild(el);
+    const def=defs[n]||{build(){},render(){}};
+    def.build(el,KIT);
+    SC[n]={n,el,def};});
+  // 칩: MotionSteps.CAPTIONS 로 만든다(#dots 바로 앞: 효과 → 칩 → 커서)
+  for(const n in MotionSteps.CAPTIONS){const d=MotionSteps.CAPTIONS[n],el=document.createElement('div');el.id='cap'+n;el.className='chip';
+    el.innerHTML='<b></b><span class="role"></span><span class="ttl"></span>';
+    el.querySelector('b').textContent=d.num;el.querySelector('.role').textContent=d.role;el.querySelector('.ttl').textContent=d.title;
+    $('stage').insertBefore(el,$('dots'));}
+})();
+function sceneTimes(C){   // rebuild 에서 단계 표로 계산
+  const ns=MotionSteps.SCENES.map(s=>s.id),loopId=(C.list.find(x=>x.type==='loop')||{}).id;
+  ns.forEach((n,i)=>{const L=C.list.filter(x=>x.scene===n),c=SC[n];
+    c.s=L[0].start/1000;c.e=L[L.length-1].end/1000;
+    c.inId=L[0].type==='trans'?L[0].id:null;
+    const nx=ns[i+1]&&C.list.find(x=>x.scene===ns[i+1]);
+    c.outId=nx&&nx.type==='trans'?nx.id:(i===ns.length-1?loopId:null);
+    c.reId=i===0?loopId:null;
+    c.holdId=(L.find(x=>x.type==='hold')||L[0]).id;});
+}
+// 장면 컨테이너의 {o, dx, t}: t 는 장면 파일에 넘길 기준 초
+function sceneView(n,t){const c=SC[n];let o=1,dx=0,ts=t;
+  if(c.inId){const st=T[c.inId];if(t<st.s)return {o:0,dx:0,t};const k=KIT.slide(t,st).in;o=k.o;dx=k.dx;}
+  if(c.outId&&t>=T[c.outId].s){const k=KIT.slide(t,T[c.outId]).out;o=k.o;dx=k.dx;}
+  if(c.reId&&t>=T[c.reId].s){const k=KIT.slide(t,T[c.reId]).in;o=k.o;dx=k.dx;ts=0;}
+  return {o,dx,t:ts};}
+
+// ======================= [공용 틀 + 기능마다 목록] 클릭, 강조, 커서 이동 (값이 바뀔 때마다 다시 만듦) =======================
+let clicks=[],rings=[],moves=[];
+const cur0=[1500,1170];   // 커서 출발점(무대 밖 아래)
+const withR=(b,r)=>({...b,r:r*b.s});
+function rebuild(){
+  const C=MotionSteps.compute(P);
+  T=C.T;BASE=C.BASE;SPEED=P.speed;DURATION=C.DURATION;window.DURATION=DURATION;window.T=T;window.STEPS=C;
+  VARIANT=P.clickVariant;FXP=CP[VARIANT];
+  clicks.forEach(c=>{ClickFX.destroyOverlay(c.o);if(c.dot)c.dot.remove();});rings.forEach(r=>r.el.remove());clicks=[];rings=[];
+  const fxOf=id=>{const v=P.steps[id]||{},V=v.fx||VARIANT;let FP=CP[V];
+    if(v.fx&&v.fxParams){FP=JSON.parse(JSON.stringify(ClickFX.defaults()[V]));for(const k in v.fxParams)for(const f in v.fxParams[k])if(FP[k]&&typeof v.fxParams[k][f]==='number')FP[k][f]=v.fxParams[k][f];}
+    return {V,FP};};
+  const add=(tc,ptFn,boxFn,{touch=false,dark=false,ring=null,id}={})=>{const {V,FP}=fxOf(id);
+    const c={id,tc,pt:ptFn(tc),box:boxFn(tc),touch,dark,V,FP,o:ClickFX.buildOverlay(fx,$('fxDiv'),V)};
+    if(touch){c.dot=document.createElement('div');c.dot.className='dot';$('dots').appendChild(c.dot);}
+    clicks.push(c);if(ring)rings.push(ring);};
+  // [기능마다] 클릭 대상 없음(커서, 클릭을 쓰지 않는 영상)
+  const TG={},RAD={},PT={};
+  const ptOf=id=>(PT[id]||ctr)(TG[id]);
+  for(const id in TG)add(T[id].press,()=>ptOf(id),()=>withR(TG[id],RAD[id]),{id});
+  // [기능마다] 강조 목록: 장면 파일의 rings: [{step, rect()}] (무대 좌표)
+  sceneTimes(C);
+  const hr=(boxFn,id,pad=8)=>{const r=T[id];return {boxFn,t0:r.s,t1:r.e,fi:r.v.in/1000,fo:r.v.out/1000,id,pad};};
+  for(const n in SC)(SC[n].def.rings||[]).forEach(r=>rings.push(hr(()=>({...r.rect(),s:1}),r.step)));
+  rings.forEach(r=>{r.el=mk('rect',{fill:'none',stroke:'#7EB3E3','stroke-width':3,rx:14});fx.insertBefore(r.el,fx.firstChild);});
+  // [기능마다] 커서 이동 없음
+  moves=[];
+  $('stage').appendChild($('dots'));$('stage').appendChild($('curDisc'));$('stage').appendChild($('cursor'));
+}
+function cursorAt(t){let p0=cur0;
+  for(const m of moves){if(t<m.t0)return p0;
+    if(t<=m.t1){const p=bez(seg(t,m.t0,m.t1)),[ax,ay]=p0,[bx,by]=m.to,dx=bx-ax,dy=by-ay,len=Math.hypot(dx,dy)||1;
+      const cx=(ax+bx)/2+(-dy/len)*len*m.k,cy=(ay+by)/2+(dx/len)*len*m.k,u=1-p;return [u*u*ax+2*u*p*cx+p*p*bx,u*u*ay+2*u*p*cy+p*p*by];}
+    p0=m.to;}
+  return p0;}
+const cursorOn=t=>false;   // [기능마다] 커서를 쓰지 않는다
+const inside=(p,b)=>p&&p[0]>=b.x&&p[0]<=b.x+b.w&&p[1]>=b.y&&p[1]<=b.y+b.h;
+
+// ======================= [기능마다] 그린 요소 재기 (글꼴을 불러온 뒤) =======================
+// 장면 파일의 measure(kit) 를 무대 배율 1 에서 부른다(기준선 맞춤 같은 글꼴 의존 배치)
+function measure(){
+  const zk=$('stage').style.zoom;$('stage').style.zoom=1;
+  for(const n in SC)if(SC[n].def.measure)SC[n].def.measure(KIT);
+  $('stage').style.zoom=zk;
+}
+
+// ======================= render(t): t = 실제 초. 모든 스타일을 t 하나로 정한다(애니메이션, 난수 없음) =======================
+function render(tr){
+  tr=((tr%DURATION)+DURATION)%DURATION;
+  const t=tr*SPEED;   // 기준 초
+
+  // ---- [공용] 단계 문구: 제목 요소마다 나타남, 사라짐, 위치 ----
+  const cI=P.caption.in/1000,cM=P.caption.move,CT=MotionSteps.captionTimes(T),EL=P.elements;
+  const env=(tin,tout,custom)=>{const a=ioC(seg(t,tin,tin+cI));if(!custom){const b=ioC(seg(t,tout,tout+cI));return {o:a*(1-b),y:cM*(1-a)-cM*b};}
+    const b=ioC(seg(t,tout,tout+0.2));return {o:a*(1-b),y:cM*(1-a)};};
+  const elState=(n,part)=>{const e=EL[`cap${n}.${part}`],ct=CT[n];
+    const tin=ct.tin<0&&e.in<=0?-1:Math.max(0,ct.tin)+e.in/1000,st=env(tin,ct.tout+e.out/1000,e.out!==0);
+    if(ct.reenter!=null&&e.in<=0){const r=env(ct.reenter,1e9,false);return st.o>=r.o?st:r;}
+    return st;};
+  const vis=window._elVis={};
+  for(const n in MotionSteps.CAPTIONS){const el=$('cap'+n),sT=elState(n,'title'),eT=EL[`cap${n}.title`];vis[`cap${n}.title`]=sT.o;
+    show(el,sT.o);el.style.transform=eT.dx||eT.dy?`translateX(-50%) translate(${eT.dx}px,${sT.y+eT.dy}px)`:`translateX(-50%) translateY(${sT.y}px)`;}
+
+  // ---- [기능마다] 화면: 장면 컨테이너(슬라이드) → 장면 파일 render ----
+  const cOn=cursorOn(t),cPos=null;
+  for(const n in SC){const c=SC[n],v=sceneView(+n,t);
+    show(c.el,v.o);c.el.style.transform=`translateX(${v.dx}px)`;
+    if(v.o>0)c.def.render({t:v.t,T,kit:KIT,n:+n});}
+
+
+  // ---- [공용] 강조 테두리 (선만) ----
+  rings.forEach(r=>{const a=ioC(seg(t,r.t0,r.t0+r.fi))*(1-ioC(seg(t,r.t1-r.fo,r.t1)));
+    if(a<=0.001||t>r.t1||t<r.t0){r.el.setAttribute('display','none');return;}
+    const b=r.boxFn(t),pad=(r.pad||8)*b.s;r.el.removeAttribute('display');
+    Object.entries({x:b.x-pad,y:b.y-pad,width:b.w+pad*2,height:b.h+pad*2,opacity:a}).forEach(([k,v])=>r.el.setAttribute(k,v));});
+
+  // ---- [공용] 클릭 효과 (click-fx.js, 실제 시간), 커서 ----
+  let press=1,discD=1e9,discC=null;
+  clicks.forEach(c=>{const tc=c.tc/SPEED,d=(tr-tc)*1000,[x,y]=c.pt;
+    if(c.dot){const a=seg(tr,tc-0.15,tc-0.07)*(1-seg(tr,tc+0.12,tc+0.35)),pz=1-0.14*seg(tr,tc-0.03,tc+0.01)*(1-seg(tr,tc+0.07,tc+0.12));
+      show(c.dot,a);Object.assign(c.dot.style,{left:x+'px',top:y+'px',transform:`scale(${lerp(1.15,1,oC(seg(tr,tc-0.15,tc-0.05)))*pz})`});}
+    const live=d>-400&&d<ClickFX.effectEnd(c.V,c.FP)+400;c.o.g.style.display=live?'':'none';c.o.els.forEach(e=>{if(!live)e.style.display='none';});
+    if(live)ClickFX.renderOverlay(c.o,d,c.FP,{x,y,box:c.box,dark:c.dark,touch:c.touch,pointer:c.touch?null:cPos});
+    if(!c.touch){press=Math.min(press,ClickFX.pressScale(d,c.FP));if(Math.abs(d)<Math.abs(discD)){discD=d;discC=c;}}});
+  const cu=$('cursor'),co=cOn?1:0,discE=discC&&discC.V==='E',cd=$('curDisc');show(cu,co);show(cd,discE?co:0);
+  if(co>0){const [x,y]=cPos;cu.style.transform=`translate(${x-2}px,${y-2}px) scale(${press})`;
+    if(discE){const sz=ClickFX.discSize(discD,discC.FP);Object.assign(cd.style,{left:x-sz/2+'px',top:y-sz/2+'px',width:sz+'px',height:sz+'px'});}}
+}
+window.render=render;
+
+// ======================= [공용 틀 + 기능마다 목록] 화면 속 움직이는 요소 (편집기에서 누르기) =======================
+window.hotspots=tr=>{
+  const tb=tr*SPEED,ms=tb*1000,by=window.STEPS.by,out=[];
+  const nm=id=>MotionSteps.STEPS.find(s=>s.id===id).name,on=(id,pre=0,post=0)=>by[id]&&ms>=by[id].start-pre&&ms<=by[id].end+post;
+  const add=(id,kind,label,b)=>{if(b&&b.w>0&&b.h>0)out.push({stepId:id,kind,label:`${nm(id)} · ${label}`,rect:{x:b.x,y:b.y,w:b.w,h:b.h}});};
+  const pad=(b,p)=>({x:b.x-p,y:b.y-p,w:b.w+2*p,h:b.h+2*p});
+  moves.forEach(m=>{if(cursorOn(tb)&&on(m.id)){const [x,y]=cursorAt(tb);add(m.id,'glide','커서 이동',{x:x-14,y:y-10,w:40,h:52});}});
+  clicks.forEach(c=>{const tail=(ClickFX.effectEnd(c.V,c.FP)+100)*SPEED;if(on(c.id,0,tail))add(c.id,'click','클릭 효과',pad(c.box,6));});
+  rings.forEach(r=>{if(r.id&&on(r.id))add(r.id,'ring','강조',pad(r.boxFn(tb),r.pad||8));});
+  // [기능마다] 없음(장면 파일의 움직이는 요소는 편집기에 올리지 않는다)
+  // [공용] 제목 요소
+  const st=$('stage').getBoundingClientRect(),z=parseFloat($('stage').style.zoom)||1,vis=window._elVis||{};
+  MotionSteps.ELEMENTS.forEach(E=>{if((vis[E.id]||0)<0.5)return;const el=$('cap'+E.n),node=el,r=node.getBoundingClientRect();
+    out.push({stepId:'el:'+E.id,kind:'element',n:E.n,part:E.part,label:'제목',rect:{x:(r.left-st.left)/z,y:(r.top-st.top)/z,w:r.width/z,h:r.height/z}});});
+  return out.sort((a,b)=>a.rect.w*a.rect.h-b.rect.w*b.rect.h);
+};
+
+// ======================= [공용] 값 불러오기, 문구 적용 =======================
+function clickParamsFrom(src){const all=ClickFX.defaults();
+  if(src)for(const v in all)for(const k of ClickFX.effectKeys(v))for(const f in all[v][k]){const x=src[v]&&src[v][k]&&src[v][k][f];if(typeof x==='number'&&isFinite(x))all[v][k][f]=x;}
+  return all;}
+window.capEditing=0;
+function applyCaptions(){for(const n in MotionSteps.CAPTIONS){if(window.capEditing===+n)continue;const el=$('cap'+n),d=MotionSteps.CAPTIONS[n],c=P.scenes[n]||{};
+  const role=(c.role||'').trim()||d.role,title=(c.title||'').replace(/\r/g,'').split('\n').map(x=>x.trim()).filter(Boolean).slice(0,2).join('\n')||d.title;
+  const key=role+'|'+title;if(el._k===key)continue;el._k=key;
+  el.querySelector('.role').textContent=role;el.querySelector('.ttl').textContent=title.replace(/\n/g,' ');}}
+window.captionOverflow=n=>$('cap'+n).offsetWidth>760;
+function applyParams(state,clickSrc){P=MotionSteps.merge(state);CP=clickParamsFrom(clickSrc||P.clickParams);applyCaptions();rebuild();if(typeof draw==='function')draw();}
+window.applyParams=applyParams;
+function readLocal(){let s=null,c=null;try{s=JSON.parse(localStorage.getItem(MotionSteps.KEY));}catch(e){}try{c=(JSON.parse(localStorage.getItem(ClickFX.KEY))||{}).params;}catch(e){}return [s,c];}
+async function loadParams(){   // 값 출처: ?params=local → localStorage(+실시간), 아니면 motion-params.json, 없으면 기본값
+  if(LOCAL){applyParams(...readLocal());
+    const ch=new BroadcastChannel(MotionSteps.CHANNEL);ch.onmessage=e=>{if(e.data&&e.data.type==='state')applyParams(e.data.state,e.data.clickParams);};
+    const ct=new BroadcastChannel('clickTuner');ct.onmessage=e=>{if(e.data&&e.data.type==='state')applyParams(P,e.data.params);};
+    addEventListener('storage',e=>{if(e.key===MotionSteps.KEY||e.key===ClickFX.KEY)applyParams(...readLocal());});
+    return 'local';}
+  try{const r=await fetch('motion-params.json',{cache:'no-store'});if(r.ok){const j=await r.json();applyParams(j,j.clickParams);return 'file';}}catch(e){}
+  applyParams(null,null);return 'default';}
+P=MotionSteps.defaults();rebuild();
+
+// ======================= [공용] 재생, 조작 (t 는 실제 초) =======================
+const BOX=q.get('box')==='1',EXPORT=q.get('export')==='1',EMBED=q.get('embed')==='1';
+let now=q.has('t')?clamp(parseFloat(q.get('t'))||0,0,DURATION):0,playing=!q.has('t')&&!EXPORT&&!EMBED,last=null,zoomK=null;
+const DECK=!EXPORT&&!EMBED&&!BOX;   // [기능마다] 발표 모드: 기본 보기 페이지(창에 꽉 차게, 아래 끝 고정)
+function layout(){const k=zoomK!=null?zoomK:EXPORT?1:BOX?1024/1920:DECK?Math.min(innerWidth/1920,innerHeight/1080):Math.min((innerWidth-40)/1920,(innerHeight-80)/1080);   // [기능마다] 발표 모드: DECK 배율
+  $('stage').style.zoom=k;Object.assign($('wrap').style,{width:1920*k+'px',height:1080*k+'px'});$('ui').style.width=1920*k+'px';
+  if(DECK)$('wrap').style.marginTop=Math.max(0,(innerHeight-1080*k)/2)+'px';}   // [기능마다] 발표 모드: 남는 높이는 위아래 같게(가운데)
+window.setZoom=k=>{zoomK=k;layout();};
+if(BOX)document.body.classList.add('box');
+if(EXPORT||EMBED)document.body.classList.add('export');
+if(DECK)document.documentElement.classList.add('deck');   // [기능마다] 발표 모드
+addEventListener('resize',layout);layout();
+function draw(){render(now);$('scrub').value=Math.round(now/DURATION*1000);$('tm').textContent=now.toFixed(2)+' s';
+  if(window.presentUI)presentUI();}   // [기능마다] 발표 모드: 진행 숫자, 이전 버튼
+window.seek=t=>{now=clamp(t,0,DURATION);draw();};
+function loop(ts){if(playing&&last!=null){const dt=(ts-last)/1000;
+  now=DECK?presentStep(now,Math.min(dt,.25)):(now+dt)%DURATION;draw();}last=ts;requestAnimationFrame(loop);}   // [기능마다] 발표 모드: 기본 보기는 dt 상한 0.25초, 정지 안에서는 시간이 가지 않는다. ?box=1 은 엔진 그대로 반복 재생
+$('pp').onclick=()=>{playing=!playing;};
+$('scrub').oninput=e=>{playing=false;seek(e.target.value/1000*DURATION);};
+addEventListener('keydown',e=>{if(EMBED||DECK)return;   // [기능마다] 발표 모드: 기본 보기의 키는 아래 발표 모드 절이 받는다
+  if(e.code==='Space'){playing=!playing;e.preventDefault();}
+  if(e.code==='ArrowRight'||e.code==='ArrowLeft'){playing=false;const s=(e.shiftKey?1:1/30)*(e.code==='ArrowRight'?1:-1);seek(((now+s)%DURATION+DURATION)%DURATION);e.preventDefault();}});
+const IMGS=[...Object.values(IMG).map(([u])=>u)];   // [기능마다] 터미널 그림 없음
+window.ready=Promise.all([loadParams(),KIT.uiReady(),KIT.imgReady(),...IMGS.map(u=>{const i=new Image();i.src=u;return i.decode();}),
+  document.fonts.load('400 15px "Pretendard Variable"','가나 ab'),document.fonts.load('700 15px "Pretendard Variable"','가나 ab'),document.fonts.ready,
+]).then(r=>{window.paramsSource=r[0];measure();rebuild();draw();if(!EXPORT&&!EMBED)requestAnimationFrame(loop);});   // [기능마다] KIT.uiReady(): ui.css 와 글꼴, KIT.imgReady(): kit.img 그림을 다 불러온 뒤에 재고 그린다
+draw();
+
+// ======================= [기능마다] 발표 모드, 장면 글꼴 미리 불러오기 =======================
+// 기본 보기(?box=1, ?export=1, ?embed=1 이 아닐 때)는 클릭으로 넘긴다.
+// 정지 = 읽는 멈춤마다: hold 단계 [시작, 끝], ring 단계는 테두리가 다 나타난 뒤 유지 구간 [시작 + in, 시작 + in + hold].
+// loop 단계가 있으면 그 단계부터는 영상 반복용이라 넣지 않는다. 마지막 정지 시작이 끝이다.
+// 자동 전환 끔: 움직임만 재생하고 다음 정지 시작에서 멈춘다. 켬: 원래 시간표대로 재생하고 마지막 정지 시작에서 멈춘다.
+// 다음(무대 클릭, → Space Enter): 정지 안이면 그 정지 끝으로(다음 움직임 재생), 움직임 중이면 다음 정지 시작으로. 마지막 정지에서는 끝 화면(#endCover)을 켠다. 끝 화면에서 또 눌러도 그대로.
+// 끝 화면은 켠 시각(endAt)과 now 가 같을 때만 보인다. seek 등으로 시각이 달라지면 풀린다.
+// 이전([이전] 버튼, ←): 끝 화면이 켜져 있으면 끝 화면만 걷는다(마지막 컷에 남음). 아니면 정지 k 안이거나 정지 k 로 가는 움직임 중이면 정지 k-1 시작으로. 첫 정지에서는 그대로.
+// Cmd, Ctrl, Alt 를 같이 누르면 받지 않는다. ?box=1, ?export=1, ?embed=1 에서는 조작 요소를 숨기고 바꾸기 전 엔진대로 재생한다.
+const EPS=1e-6;   // 정지 경계 비교 허용 오차
+const stops=()=>{const C=window.STEPS,o=[];
+  for(const x of C.list){if(x.type==='loop')break;
+    if(x.type==='hold')o.push({id:x.id,s:x.start/1000/SPEED,e:x.end/1000/SPEED});
+    if(x.type==='ring')o.push({id:x.id,s:(x.start+x.v.in)/1000/SPEED,e:(x.start+x.v.in+x.v.hold)/1000/SPEED});}
+  return o;};
+window.stops=stops;
+// t 의 정지 번호 k 와 정지 안인지. 움직임 중이면 그 움직임이 향하는 정지. 마지막 정지 뒤는 마지막 정지로 본다
+function stopAt(t){const S=stops(),k=S.findIndex(x=>x.e>t+EPS);
+  return k<0?{S,k:S.length-1,inStop:true}:{S,k,inStop:S[k].s<=t+EPS};}
+let autoOn=q.get('auto')==='1';   // 저장하지 않는다
+function presentStep(t,dt){const {S,k,inStop}=stopAt(t),L=S[S.length-1];
+  if(k===S.length-1&&inStop)return t;   // 마지막 정지에서 멈춘다
+  if(autoOn)return Math.min(t+dt,L.s);
+  return inStop?t:Math.min(t+dt,S[k].s);}
+let endAt=null;   // 끝 화면을 켠 시각(now)
+function advance(){const {S,k,inStop}=stopAt(now);
+  if(k===S.length-1&&inStop){if(endAt===null){endAt=now;draw();}return;}
+  now=inStop?S[k].e:S[k].s;playing=true;draw();}
+function back(){if(endAt!==null){endAt=null;draw();return;}
+  const {S,k}=stopAt(now);
+  if(k<1)return;
+  now=S[k-1].s;playing=true;draw();}
+window.advance=advance;window.back=back;
+window.presentUI=()=>{if(!DECK)return;
+  if(endAt!==now)endAt=null;
+  $('stage').classList.toggle('ended',endAt!==null);
+  const {S,k}=stopAt(now);
+  $('prog').textContent=(k+1)+' / '+S.length;
+  $('prev').disabled=k<1;};
+if(DECK){
+  now=Math.min(now,stops().at(-1).e);   // ?t= 가 마지막 정지 뒤(처음으로 돌아가는 전환)면 마지막 정지로
+  $('stage').addEventListener('click',e=>{if(e.target.closest('#prev,#autoLbl'))return;advance();});
+  $('prev').addEventListener('click',()=>{back();$('prev').blur();});
+  $('auto').checked=autoOn;
+  $('auto').addEventListener('change',()=>{autoOn=$('auto').checked;draw();});
+  addEventListener('keydown',e=>{
+    if(e.metaKey||e.ctrlKey||e.altKey)return;
+    if(e.target.tagName==='BUTTON'&&(e.code==='Enter'||e.code==='Space'))return;   // 버튼은 자기 동작만
+    if(e.code==='ArrowLeft'){e.preventDefault();if(!e.repeat)back();return;}
+    if(e.target.tagName==='INPUT'&&e.code==='Space')return;   // 체크박스에서 Space 는 체크만 바꾼다(→, Enter 는 넘긴다)
+    if(e.code==='ArrowRight'||e.code==='Space'||e.code==='Enter'){e.preventDefault();if(!e.repeat)advance();}});
+  draw();
+}
+// 장면 글(한글)이 쓰는 Pretendard 조각 파일을 모두 불러온 뒤 다시 잰다(숨은 글은 브라우저가 미리 불러오지 않는다)
+const sceneText=[$('prev').textContent,$('endCover').textContent,$('autoLbl').textContent,...Object.values(SC).map(c=>c.el.textContent),...Object.values(MotionSteps.CAPTIONS).map(c=>c.role+c.title)].join('')+'0123456789';
+window.ready=Promise.all([window.ready,...[500,600,700,800].map(w=>document.fonts.load(`${w} 40px "Pretendard Variable"`,sceneText))])
+  .then(()=>document.fonts.ready).then(()=>{measure();draw();});
+</script>
+</body>
+</html>

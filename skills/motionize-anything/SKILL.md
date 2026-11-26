@@ -46,7 +46,9 @@ description: 제품 사용법이나 개념 설명을 화면 녹화 없이 HTML �
     explainer/       설명 모션 시작 틀(index.html, motion-steps.js, ui.css, CONTRACT.md, scenes/, tools/, 공용 파일)
   examples/
     usage-demo/      완성 예시: 가짜 메모 앱, 장면 3, 클릭, 입력, 화면 전환, 문제 박스, 터미널 단계
+    explainer-demo/  완성 예시: 가상 문서 검색 도구 진행 상황, 장면 5, 컷 12, 설명 모션의 화면 디자인 기준
 ```
 
 - 새 모션 폴더는 `engine/usage/`(사용법) 또는 `engine/explainer/`(설명)에서 복사해 시작한다. 복사 명령은 각 reference 문서에 있다.
-- 완성 예시는 `examples/usage-demo/` 다. 서버를 띄워 열어 보면 엔진이 하는 일을 한눈에 볼 수 있다.
+- 사용법 모션의 완성 예시는 `examples/usage-demo/` 다. 서버를 띄워 열어 보면 엔진이 하는 일을 한눈에 볼 수 있다.
+- 설명 모션의 완성 예시는 `examples/explainer-demo/` 다. 설명 모션의 화면 디자인은 이 예시를 기준으로 하고, 장면 파일에서 색, 칸 모양, 큰 숫자, 단계 원, 박스 흐름, 끝 화면을 가져다 쓴다.

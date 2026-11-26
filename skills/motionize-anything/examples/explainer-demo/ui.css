@@ -1,0 +1,67 @@
+/* 설명 모션의 화면 조각(kit.ui)이 쓰는 작은 CSS. shadow root 안에 불러온다.
+   색과 글꼴은 --mx-* 변수 한 곳에 모았다. kit.W(scenes/kit.js)와 같은 값이다. 바꿀 때는 둘을 함께 바꾼다. */
+:host {
+  --mx-font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+  --mx-text: #0F172A;
+  --mx-subtle: #64748B;
+  --mx-line: #E2E8F0;
+  --mx-strong: #CBD5E1;
+  --mx-muted: #F1F5F9;
+  --mx-white: #FFFFFF;
+  --mx-black: #000000;
+  --mx-blue: #2563EB;
+  --mx-blue-bg: #EFF6FF;
+  --mx-blue-bd: #BFDBFE;
+  --mx-warn: #92400E;
+  --mx-warn-bg: #FFFBEB;
+  --mx-warn-bd: #FDE68A;
+  --mx-error: #B91C1C;
+  --mx-error-bg: #FEF2F2;
+  --mx-error-bd: #FECACA;
+  --mx-success: #16A34A;
+  --mx-success-bg: #F0FDF4;
+  --mx-success-bd: #BBF7D0;
+}
+
+/* 배너 (높이 49) */
+.mx-Banner { display: flex; align-items: center; gap: 8px; box-sizing: border-box; height: 49px; padding: 0 20px 0 16px; border-radius: 12px; border: 1px solid var(--bd); background: var(--bg); color: var(--fg); font-size: 14px; font-weight: 500; white-space: nowrap; }
+.mx-Banner[data-tone="warning"] { --bg: var(--mx-warn-bg); --bd: var(--mx-warn-bd); --fg: var(--mx-warn); }
+.mx-Banner[data-tone="info"] { --bg: var(--mx-blue-bg); --bd: var(--mx-blue-bd); --fg: var(--mx-blue); }
+.mx-Banner[data-tone="neutral"] { --bg: var(--mx-muted); --bd: var(--mx-line); --fg: var(--mx-text); }
+.mx-Banner[data-tone="success"] { --bg: var(--mx-success-bg); --bd: var(--mx-success-bd); --fg: var(--mx-success); }
+.mx-Banner[data-tone="error"] { --bg: var(--mx-error-bg); --bd: var(--mx-error-bd); --fg: var(--mx-error); }
+.mx-Banner__icon { display: flex; flex: none; }
+.mx-Banner__body { min-width: 0; }
+
+/* 버튼 (sm 높이 40) */
+.mx-Button { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; height: 40px; padding: 0 16px; border: 1px solid transparent; border-radius: 8px; font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.mx-Button[data-color="primary"] { background: var(--mx-black); color: var(--mx-white); }
+.mx-Button[data-color="secondary"] { background: var(--mx-muted); color: var(--mx-text); border-color: var(--mx-strong); }
+
+/* 선택 (md 20px) */
+.mx-Radio { display: flex; align-items: center; }
+.mx-Radio__box { display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: 20px; height: 20px; border: 2px solid var(--mx-strong); border-radius: 50%; background: var(--mx-white); }
+.mx-Radio__dot { width: 10px; height: 10px; border-radius: 50%; background: transparent; }
+.mx-Radio[data-value="on"] .mx-Radio__box { border-color: var(--mx-black); }
+.mx-Radio[data-value="on"] .mx-Radio__dot { background: var(--mx-black); }
+
+/* 입력 필드 (TextInput 높이 40, Textarea 높이 89) */
+.mx-Field { display: block; }
+.mx-Field__box { display: flex; align-items: center; box-sizing: border-box; height: 40px; padding: 0 12px; border: 1px solid var(--mx-strong); border-radius: 8px; background: var(--mx-white); }
+.mx-Field__value { width: 100%; min-width: 0; padding: 0; border: 0; outline: 0; background: transparent; font: inherit; font-size: 14px; color: var(--mx-text); resize: none; }
+.mx-Textarea .mx-Field__box { align-items: flex-start; height: 89px; padding: 10px 12px; }
+.mx-Textarea .mx-Field__value { height: 100%; }
+
+/* 카드, 배지, 막대 */
+.mx-Card { display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; padding: 16px 20px; border: 1px solid var(--mx-line); border-radius: 12px; background: var(--mx-white); }
+.mx-Card__title { font-size: 16px; font-weight: 700; line-height: 1.4; }
+.mx-Badge { display: inline-flex; align-items: center; box-sizing: border-box; height: 24px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; background: var(--mx-muted); color: var(--mx-text); }
+.mx-Badge[data-size="xs"] { height: 20px; padding: 0 6px; font-size: 11px; }
+.mx-Badge[data-color="info"] { background: var(--mx-blue-bg); color: var(--mx-blue); }
+.mx-Badge[data-color="primary"] { background: var(--mx-black); color: var(--mx-white); }
+.mx-Badge[data-color="secondary"] { background: var(--mx-muted); color: var(--mx-subtle); }
+.mx-Badge[data-color="positive"] { background: var(--mx-success-bg); color: var(--mx-success); }
+.mx-Badge[data-color="cautionary"] { background: var(--mx-warn-bg); color: var(--mx-warn); }
+.mx-Badge[data-color="negative"] { background: var(--mx-error-bg); color: var(--mx-error); }
+.mx-Skeleton { display: flex; flex-direction: column; gap: 8px; }
+.mx-Skeleton__bar { display: block; height: 12px; border-radius: 6px; background: var(--mx-line); }
