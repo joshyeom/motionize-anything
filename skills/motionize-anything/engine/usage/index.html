@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-theme="motionize">
 <head>
 <meta charset="utf-8" />
 <title>사용법 모션 시작 틀</title>
@@ -7,114 +7,90 @@
   [공용]     = 사용법 모션 엔진 그대로 (engine/usage/ 에서 복사)
   [기능마다] = 새 사용법 모션의 시작 틀. 장면 1개, 가짜 앱 창, 클릭 1번, 화면 전환 1번, 처음으로 돌아가기. 이 파일의 [기능마다] 부분을 제품에 맞게 바꾼다.
 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.8.2/daisyui.css" />
+<link rel="stylesheet" href="ui.css" />
 <style>
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
-/* [공용] 무대, 보기 방식 */
-html,body{margin:0;background:#ddd;font-family:Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;}
-body.box{background:#fff;}
-body.export{background:#f2f4f6;}
+/* 모든 화면 요소는 daisyUI 컴포넌트 클래스로 그린다. 색, 글꼴, 모서리는 ui.css 의 테마(data-theme="motionize")가 정한다.
+   이 <style> 에는 배치용 규칙만 있다(무대 좌표, 보기 방식, 발표 모드의 자리) */
+/* [공용] 배치용: 무대, 보기 방식 */
+html,body{margin:0;}
 #wrap{position:relative;margin:20px auto 0;overflow:hidden;}
-body.box #wrap{border-radius:32px;margin-top:40px;}
+body.box #wrap{margin-top:40px;}
 body.export #wrap{margin:0;}
 body.export #ui{display:none;}
-#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;background:#f2f4f6;overflow:hidden;}
-#stage div{position:absolute;}
-#stage .capBig div,#stage .chip div,#stage .fl div,#stage .fl span{position:static;}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;}
+#stage div:not(.kw *){position:absolute;}   /* 무대 안 div 는 좌표로 놓는다. daisyUI 마크업(.kw) 안쪽은 제외 */
 .img{background-repeat:no-repeat;}
-.shadow{box-shadow:0 12px 40px rgba(0,0,0,.08);}
-/* [공용] 단계 문구: 칩(PC). 번호 칸 파랑 rgb(31,102,241) */
-.chip{left:960px;top:17px;height:56px;display:flex;align-items:center;gap:12px;padding:0 28px 0 8px;background:#fff;border-radius:28px;white-space:nowrap;box-shadow:0 12px 40px rgba(0,0,0,.08);}
-.chip b{width:40px;height:40px;border-radius:20px;background:rgb(31,102,241);color:#fff;font-size:19px;font-weight:800;display:flex;align-items:center;justify-content:center;}
-.chip .role{font-size:27px;font-weight:600;color:#666;}
-.chip .role:empty{display:none;}
-.chip .ttl{font-size:29px;font-weight:800;color:#000;letter-spacing:-.02em;}
-/* [공용] 클릭 효과, 커서 */
+/* [공용] 배치용: 클릭 효과, 커서, 조작줄 */
 #fx{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;}
-#cursor{position:absolute;left:0;top:0;width:30px;height:44px;overflow:visible;filter:drop-shadow(0 2px 3px rgba(0,0,0,.28));transform-origin:2px 2px;}
-.dot{width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:rgba(0,0,0,.28);box-shadow:0 0 0 2px #fff inset;}
-#ui{display:flex;align-items:center;gap:12px;margin:14px auto;font:13px/1 ui-monospace,Menlo,monospace;color:#000;}
+#cursor{position:absolute;left:0;top:0;width:30px;height:44px;overflow:visible;transform-origin:2px 2px;}
+.dot{width:44px;height:44px;margin:-22px 0 0 -22px;}
+#ui{display:flex;align-items:center;gap:12px;margin:14px auto;}
 #ui input{flex:1;}
-#ui button{font:inherit;padding:4px 10px;}
-[contenteditable]{outline:none;caret-color:#3182f3;}
 
 
-
-/* ======================= [기능마다] 화면 배치 ======================= */
-/* 장면 문장 자리: x 120, 위 문장 y 114 h 48 40px 700, 아래 문장 y 166 h 44 34px 600 */
-/* 장면 문장 자리(문서 설명 모션 kit.SENT 와 같음): x 120, 위 문장 y 114 h 48 40px 700, 아래 문장 y 166 h 44 34px 600 */
-.sent{left:120px;white-space:nowrap;font-family:"Pretendard Variable",Pretendard,-apple-system,sans-serif;color:rgb(25,31,40);-webkit-font-smoothing:antialiased;}
-.sent.l1{top:114px;height:48px;line-height:48px;font-size:40px;font-weight:700;}
-.sent.l2{top:166px;height:44px;line-height:44px;font-size:34px;font-weight:600;}
-
-/* 앱 창: 1280×820 CSS 를 1.0배, 가로 가운데, 문장 자리 아래 y 240~1060 */
-#win{left:320px;top:240px;width:1280px;height:820px;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 12px 40px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.04);}
-#app{left:0;top:0;width:1280px;height:820px;transform-origin:0 0;overflow:hidden;background:#fff;}
-.pt{font-family:"Pretendard Variable",Pretendard,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;color:rgb(26,31,39);}
-.btn{border-radius:10px;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;box-sizing:border-box;background:#1f66f1;color:#fff;}
-/* 문제 박스(무대 px) */
-.issue{display:flex;align-items:center;gap:12px;padding:12px 22px 12px 12px;background:#fdf3e7;color:#b25e09;border:1.5px solid rgba(178,94,9,.3);border-radius:14px;font-family:"Pretendard Variable",Pretendard,sans-serif;font-size:24px;font-weight:700;letter-spacing:-.015em;white-space:nowrap;box-shadow:0 12px 32px rgba(0,0,0,.14);-webkit-font-smoothing:antialiased;}
-.issue b{background:#b25e09;color:#fff;font-size:18px;font-weight:800;padding:4px 10px;border-radius:8px;letter-spacing:0;}
-/* [기능마다] 발표 모드: 기본 보기 페이지(?box=1, ?export=1, ?embed=1 은 바꾸기 전 엔진 그대로). 무대 밖 조작 영역은 숨기고 DOM 은 남긴다 */
-html.deck,html.deck body{background:#f2f4f6;}
+/* ======================= [기능마다] 화면 배치(배치용) ======================= */
+/* 배치용: 앱 창, daisyUI mockup-window 1280×820, 가로 가운데, 문장 자리 아래 y 240~1060. 위쪽 48px 는 창 막대(점 3개)라서 앱 화면은 그 아래 1280×772 */
+#win{left:320px;top:240px;width:1280px;height:820px;}
+#app{left:0;top:48px;width:1280px;height:772px;transform-origin:0 0;overflow:hidden;}
+/* [기능마다] 배치용, 발표 모드: 기본 보기 페이지(?box=1, ?export=1, ?embed=1 은 바꾸기 전 엔진 그대로). 무대 밖 조작 영역은 숨기고 DOM 은 남긴다 */
 html.deck body{overflow:hidden;}
 html.deck #wrap{margin:0 auto;}
 html.deck #ui{display:none;}
-/* [기능마다] 발표 모드: 무대 안 조작 요소(기준 무대 좌표). 앱 창 양옆 빈 곳(폭 320) 아래 구석에 둔다 */
+/* [기능마다] 배치용, 발표 모드: 무대 안 조작 요소(기준 무대 좌표). 앱 창 양옆 빈 곳(폭 320) 아래 구석에 둔다 */
 html.deck #stage{cursor:pointer;user-select:none;-webkit-user-select:none;}
-html:not(.deck) #prev,html:not(.deck) #autoLbl,html:not(.deck) #stage #prog{display:none;}
-#prev{position:absolute;left:24px;bottom:28px;height:44px;padding:0 20px;box-sizing:border-box;border:0;border-radius:22px;background:#fff;display:flex;align-items:center;gap:8px;font:700 20px "Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;color:#333d4b;cursor:pointer;-webkit-appearance:none;appearance:none;}
-#prev:hover:not(:disabled){background:#e5e8eb;}
-#prev:disabled{opacity:.35;cursor:default;}
-#prev svg{flex:none;width:16px;height:16px;}
-#autoLbl{position:absolute;right:16px;bottom:28px;height:44px;display:flex;align-items:center;gap:10px;font:500 20px "Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;color:#6b7684;cursor:pointer;}
-#autoLbl input{margin:0;width:20px;height:20px;accent-color:rgb(31,102,241);cursor:pointer;}
-#stage #prog{right:16px;bottom:84px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;white-space:nowrap;-webkit-font-smoothing:antialiased;}
-#prog b{font-size:22px;font-weight:700;color:#333d4b;}
-#prog span{font-size:15px;font-weight:500;color:#6b7684;}
+html:not(.deck) #prevBox,html:not(.deck) #autoLbl,html:not(.deck) #progBox{display:none;}
+#prevBox{left:24px;bottom:28px;}
+#autoLbl{right:16px;bottom:28px;}
+#progBox{right:16px;bottom:84px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
 </style>
 </head>
 <body>
-<div id="wrap"><div id="stage">
+<div id="wrap" class="bg-base-200"><div id="stage" class="bg-base-200" style="--color-info:var(--color-usage-blue);--color-warning:var(--color-issue)">
   <!-- [기능마다] 앱 창: 화면을 HTML 로 그린다(캡처 PNG 를 쓰면 IMG 와 patch 로 바꾼다). 새 모션에서는 이 안을 제품 화면으로 바꾼다 -->
-  <div id="win">
-    <div id="app" class="pt">
-      <div id="vA" style="left:0;top:0;width:1280px;height:820px">
-        <div style="left:60px;top:40px;font-size:28px;font-weight:700">화면 이름</div>
-        <div id="btnA" class="btn" style="left:60px;top:120px;width:160px;height:48px">버튼</div>
+  <div id="win" class="mockup-window bg-base-100">
+    <div id="app" class="kw">
+      <!-- 앱 화면은 daisyUI 기본 크기의 1.25배(zoom)로 읽히게 키운다. 안쪽 좌표는 확대 전 값이다(APP.s = 1.25) -->
+      <div id="appz" style="position:absolute;left:0;top:0;width:1024px;height:618px;zoom:1.25">
+        <div id="vA" style="position:absolute;left:0;top:0;width:1024px;height:618px">
+          <div style="position:absolute;left:48px;top:32px;white-space:nowrap"><b style="zoom:1.5">화면 이름</b></div>
+          <button id="btnA" class="btn btn-info" type="button" tabindex="-1" style="position:absolute;left:48px;top:96px;width:128px;height:40px">버튼</button>
+        </div>
+        <div id="vB" style="position:absolute;left:0;top:0;width:1024px;height:618px">
+          <div style="position:absolute;left:48px;top:32px;white-space:nowrap"><b style="zoom:1.5">결과 화면</b></div>
+          <div class="label" style="position:absolute;left:48px;top:96px;white-space:nowrap">버튼을 누르면 이 화면이 열립니다</div>
+        </div>
+        <div id="veil" class="bg-base-100" style="position:absolute;left:0;top:0;width:1024px;height:618px"></div>
       </div>
-      <div id="vB" style="left:0;top:0;width:1280px;height:820px">
-        <div style="left:60px;top:40px;font-size:28px;font-weight:700">결과 화면</div>
-        <div style="left:60px;top:120px;font-size:18px;color:#6b7684">버튼을 누르면 이 화면이 열립니다</div>
-      </div>
-      <div id="veil" style="left:0;top:0;width:1280px;height:820px;background:#fff"></div>
     </div>
   </div>
   <!-- [공용] 효과 층 (순서 유지: 효과 → 문구 → 커서) -->
   <div id="fxDiv" style="inset:0;pointer-events:none"></div>
   <svg id="fx" width="1920" height="1080" viewBox="0 0 1920 1080"></svg>
-  <div id="curDisc" style="border-radius:50%;background:rgba(237,255,0,.35);display:none"></div>
+  <div id="curDisc" class="status status-warning" style="--color-warning:var(--color-click-yellow);display:none"></div>
   <!-- [기능마다] 문제 박스 (무대 px, 강조 선 위) -->
   <div id="issues" style="inset:0;pointer-events:none"></div>
   <!-- [공용 구조] 단계 문구 -->
   <div id="sents"></div>
-  <div id="cap1" class="chip"><b>1</b><span class="role">역할</span><span class="ttl">질문 형태의 제목</span></div>
+  <div id="cap1" class="chip" style="left:960px;top:17px"><span class="badge badge-lg border-base-300 bg-base-100" style="zoom:2;white-space:nowrap"><span class="badge badge-info num">1</span><span class="text-neutral role">역할</span><b class="ttl">질문 형태의 제목</b></span></div>
   <div id="dots"></div>
-  <svg id="cursor" viewBox="0 0 15 22"><path d="M1 1 L1 17.6 L5.1 13.7 L7.9 20.2 L10.7 19 L7.9 12.7 L13.5 12.7 Z" fill="#000" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg>
-  <!-- [기능마다] 발표 모드: 이전 버튼, 진행 표시와 안내, 자동 전환 -->
-  <button type="button" id="prev"><svg viewBox="0 0 16 16" fill="none" stroke="#333d4b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="10,2.5 4.5,8 10,13.5"/></svg>이전</button>
-  <div id="prog"><b id="progN"></b><span>클릭하거나 → 키로 넘김</span></div>
-  <label id="autoLbl"><input type="checkbox" id="auto" /><span>자동 전환</span></label>
+  <svg id="cursor" class="text-primary" viewBox="0 0 15 22"><path d="M1 1 L1 17.6 L5.1 13.7 L7.9 20.2 L10.7 19 L7.9 12.7 L13.5 12.7 Z" fill="currentColor" stroke="var(--color-primary-content)" stroke-width="1" stroke-linejoin="round"/></svg>
+  <!-- 크기는 확대 배율(zoom)로 정한다. daisyUI 컴포넌트는 rem 크기가 정해져 있어서 무대에서 읽히게 키운다 -->
+  <div id="prevBox"><button type="button" id="prev" class="btn" style="--btn-color:var(--color-base-100);zoom:1.25"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="10,2.5 4.5,8 10,13.5"/></svg>이전</button></div>
+  <div id="progBox"><span style="zoom:1.5"><b id="progN"></b></span><span class="label" style="zoom:1.1">클릭하거나 → 키로 넘김</span></div>
+  <div id="autoLbl"><label class="label" style="zoom:1.5"><input type="checkbox" id="auto" class="checkbox checkbox-info checkbox-sm" /><span>자동 전환</span></label></div>
 
-<div id="ui"><button id="pp">재생/정지</button><input id="scrub" type="range" min="0" max="1000" step="1" value="0"><span id="tm">0.00 s</span></div>
-<script src="click-fx.js?v=4"></script>
+</div></div>
+<div id="ui"><button id="pp" class="btn btn-sm">재생/정지</button><input id="scrub" class="range range-xs" type="range" min="0" max="1000" step="1" value="0"><span id="tm" class="badge badge-ghost">0.00 s</span></div>
+<script src="click-fx.js?v=5"></script>
 <script src="motion-steps.js?v=1"></script>
 <script>
 
 // ======================= [기능마다] 데이터 =======================
 const IMG={};   // 캡처 PNG 를 쓰는 모션이면 {키: ['pages/이름.png', CSS폭, CSS높이]} 로 채운다
-const APP={x:320,y:240,s:1,w:1280,h:820};   // 앱 창 왼쪽 위(무대 px), 배율
-const R={btn:{x:60,y:120,w:160,h:48}};      // 앱 안 사각형(CSS px, 앱 왼쪽 위 기준). 캡처로 재서 옮겨 적는다
-// 문제 박스: 필요하면 {id: {txt, rings: ()=>[사각형], box: {x, y, ax: 'l'|'c'|'r', ay: 't'|'b'}}} 로 채운다. id 는 단계 표의 ring 단계 id 와 같다
+const APP={x:320,y:288,s:1.25,w:1280,h:772};   // 앱 화면 왼쪽 위(무대 px, 창 막대 48px 아래), 배율(앱 안 좌표는 확대 전 값)
+const R={btn:{x:0,y:0,w:0,h:0}};            // 앱 안 사각형(CSS px, 앱 왼쪽 위 기준). measure 의 measureApp 이 DOM 에서 재어 채운다
+// 문제 박스: 필요하면 {id: {txt, rings: ()=>[사각형], box: {x, y, ax: 'l'|'c'|'r', ay: 't'|'b'} 또는 그 값을 돌려주는 함수}} 로 채운다. id 는 단계 표의 ring 단계 id 와 같다
 const ISS={};
 
 // ======================= [공용] 수학, 도구 =======================
@@ -163,7 +139,7 @@ function rebuild(){
     return {V,FP};};
   const add=(tc,ptFn,boxFn,{touch=false,dark=false,ring=null,id}={})=>{const {V,FP}=fxOf(id);
     const c={id,tc,pt:ptFn(tc),box:boxFn(tc),touch,dark,V,FP,o:ClickFX.buildOverlay(fx,$('fxDiv'),V)};
-    if(touch){c.dot=document.createElement('div');c.dot.className='dot';$('dots').appendChild(c.dot);}
+    if(touch){c.dot=document.createElement('div');c.dot.className='dot status status-neutral';$('dots').appendChild(c.dot);}
     clicks.push(c);if(ring)rings.push(ring);};
   // [기능마다] 클릭 대상(무대 좌표)
   const TG={s1_clickBtn:aBox(R.btn)};
@@ -171,10 +147,10 @@ function rebuild(){
   const PT={};
   const ptOf=id=>(PT[id]||ctr)(TG[id]);
   for(const id in TG)add(T[id].press,()=>ptOf(id),()=>withR(TG[id],RAD[id]),{dark:false,id});
-  // [기능마다] 강조(파랑 = 보기, 주황 = 문제)
-  const hr=(boxFn,id,pad=8,color='rgb(31,102,241)')=>{const r=T[id];return {boxFn,t0:r.s,t1:r.e,fi:r.v.in/1000,fo:r.v.out/1000,id,pad,color};};
-  for(const id in ISS)ISS[id].rings().forEach((_,i)=>rings.push(hr(()=>ISS[id].rings()[i],id,6,'#b25e09')));
-  rings.forEach(r=>{r.el=mk('rect',{fill:'none',stroke:r.color,'stroke-width':r.color==='#b25e09'?4:3,rx:12});fx.insertBefore(r.el,fx.firstChild);});
+  // [기능마다] 강조(파랑 info = 보기, 주황 warning = 문제)
+  const hr=(boxFn,id,pad=8,tone='info')=>{const r=T[id];return {boxFn,t0:r.s,t1:r.e,fi:r.v.in/1000,fo:r.v.out/1000,id,pad,tone};};
+  for(const id in ISS)ISS[id].rings().forEach((_,i)=>rings.push(hr(()=>ISS[id].rings()[i],id,6,'warning')));
+  rings.forEach(r=>{r.el=mk('rect',{class:'text-'+r.tone,fill:'none',stroke:'currentColor','stroke-width':r.tone==='warning'?4:3,rx:12});fx.insertBefore(r.el,fx.firstChild);});
   // [기능마다] 커서 이동 목록: [glide 단계, 도착 클릭 단계]
   const MV=[['s1_glideBtn','s1_clickBtn']];
   moves=MV.map(([g,c])=>({t0:T[g].s,t1:T[g].e,k:T[g].v.curve/100,to:ptOf(c),id:g}));
@@ -191,15 +167,27 @@ const inside=(p,b)=>p&&p[0]>=b.x&&p[0]<=b.x+b.w&&p[1]>=b.y&&p[1]<=b.y+b.h;
 
 // ======================= [기능마다] 그린 요소 만들기, 재기 (글꼴을 불러온 뒤) =======================
 function build(){
-  for(const id in ISS){const d=document.createElement('div');d.className='issue';d.id='iss_'+id;d.innerHTML='<b>문제</b><span></span>';d.querySelector('span').textContent=ISS[id].txt;$('issues').appendChild(d);}
-  for(const n in MotionSteps.SENTENCES)MotionSteps.SENTENCES[n].forEach((s,i)=>{const d=document.createElement('div');d.className='sent l'+(i+1);d.id='sent'+n+'_'+(i+1);d.textContent=s;$('sents').appendChild(d);});
+  for(const id in ISS){const d=document.createElement('div');d.className='issue';d.id='iss_'+id;
+    d.innerHTML='<span class="alert alert-warning alert-soft" style="zoom:1.5;white-space:nowrap"><span class="badge badge-warning">문제</span><span class="txt"></span></span>';   // 문제 박스: daisyUI alert 와 badge, 24px 글자(zoom)
+    d.querySelector('.txt').textContent=ISS[id].txt;$('issues').appendChild(d);}
+  for(const n in MotionSteps.SENTENCES)MotionSteps.SENTENCES[n].forEach((s,i)=>{const d=document.createElement('div');d.className='sent';d.id='sent'+n+'_'+(i+1);
+    d.style.cssText='left:120px;top:'+(i?166:114)+'px;white-space:nowrap';   // 문장 자리: 위 문장 y 114(글자 40px 굵게), 아래 문장 y 166(글자 34px)
+    d.innerHTML=i?'<span style="zoom:2.125"></span>':'<span style="zoom:2.5"><b></b></span>';(d.querySelector('b')||d.firstChild).textContent=s;$('sents').appendChild(d);});
 }
 build();
+// 앱 안 요소의 사각형(CSS px, 앱 왼쪽 위 기준)을 레이아웃 값(offset)으로 잰다(변형과 무대 배율에 영향받지 않음)
+const rel=el=>{let x=0,y=0,e=el;while(e&&e!==$('appz')){x+=e.offsetLeft;y+=e.offsetTop;e=e.offsetParent;}return {x,y,w:el.offsetWidth,h:el.offsetHeight};};
+function measureApp(){
+  const hid=['win','vA','vB'].map(id=>[$(id),$(id).style.display]);hid.forEach(([e])=>{e.style.display='';});
+  R.btn=rel($('btnA'));
+  hid.forEach(([e,d])=>{e.style.display=d;});
+}
 function measure(){
   const zk=$('stage').style.zoom;$('stage').style.zoom=1;
   for(const id in ISS){const el=$('iss_'+id),d=el.style.display;el.style.display='';MEAS[id]={w:el.offsetWidth,h:el.offsetHeight};el.style.display=d;}
+  measureApp();fitChips();
   $('stage').style.zoom=zk;
-  for(const id in ISS){const b=ISS[id].box,el=$('iss_'+id),m=MEAS[id];
+  for(const id in ISS){const b=typeof ISS[id].box==='function'?ISS[id].box():ISS[id].box,el=$('iss_'+id),m=MEAS[id];
     const p=[APP.x+b.x*APP.s,APP.y+b.y*APP.s];
     el.style.left=(b.ax==='r'?p[0]-m.w:b.ax==='c'?p[0]-m.w/2:p[0])+'px';el.style.top=(b.ay==='b'?p[1]-m.h:p[1])+'px';}
 }
@@ -251,7 +239,7 @@ function render(tr){
     const live=d>-400&&d<ClickFX.effectEnd(c.V,c.FP)+400;c.o.g.style.display=live?'':'none';c.o.els.forEach(e=>{if(!live)e.style.display='none';});
     if(live)ClickFX.renderOverlay(c.o,d,c.FP,{x,y,box:c.box,dark:c.dark,touch:c.touch,pointer:c.touch?null:cPos});
     if(!c.touch){press=Math.min(press,ClickFX.pressScale(d,c.FP));if(Math.abs(d)<Math.abs(discD)){discD=d;discC=c;}}});
-  const cu=$('cursor'),co=cOn?1:0,discE=discC&&discC.V==='E',cd=$('curDisc');show(cu,co);show(cd,discE?co:0);
+  const cu=$('cursor'),co=cOn?1:0,discE=discC&&discC.V==='E',cd=$('curDisc');show(cu,co);show(cd,discE?co*0.35:0);
   if(co>0){const [x,y]=cPos;cu.style.transform=`translate(${x-2}px,${y-2}px) scale(${press})`;
     if(discE){const sz=ClickFX.discSize(discD,discC.FP);Object.assign(cd.style,{left:x-sz/2+'px',top:y-sz/2+'px',width:sz+'px',height:sz+'px'});}}
   clicks.forEach(c=>{c.o.g.style.opacity=hw.o;});   // 창이 사라지면 클릭 효과도 함께
@@ -275,10 +263,12 @@ function clickParamsFrom(src){const all=ClickFX.defaults();
   if(src)for(const v in all)for(const k of ClickFX.effectKeys(v))for(const f in all[v][k]){const x=src[v]&&src[v][k]&&src[v][k][f];if(typeof x==='number'&&isFinite(x))all[v][k][f]=x;}
   return all;}
 window.capEditing=0;
+// 칩 폭을 짝수 정수 px 로 맞춘다(가운데 정렬 translateX(-50%)가 정수 px 가 되어 같은 t 면 같은 픽셀이 나온다). 무대 배율 1 에서만 부른다
+function fitChips(){for(const n in MotionSteps.CAPTIONS){const el=$('cap'+n),d=el.style.display;el.style.width='';el.style.display='';el.style.width=2*Math.ceil(el.offsetWidth/2)+'px';el.style.display=d;}window.chipsFit=true;}
 function applyCaptions(){for(const n in MotionSteps.CAPTIONS){if(window.capEditing===+n)continue;const el=$('cap'+n),d=MotionSteps.CAPTIONS[n],c=P.scenes[n]||{};
   const role=(c.role||'').trim()||d.role,title=(c.title||'').replace(/\r/g,'').split('\n').map(x=>x.trim()).filter(Boolean).slice(0,2).join('\n')||d.title;
   const key=role+'|'+title;if(el._k===key)continue;el._k=key;
-  el.querySelector('.role').textContent=role;el.querySelector('.ttl').textContent=title.replace(/\n/g,' ');}}
+  el.querySelector('.role').textContent=role;el.querySelector('.role').hidden=!role;el.querySelector('.ttl').textContent=title.replace(/\n/g,' ');}if(window.chipsFit)fitChips();}
 window.captionOverflow=n=>$('cap'+n).offsetWidth>760;
 function applyParams(state,clickSrc){P=MotionSteps.merge(state);CP=clickParamsFrom(clickSrc||P.clickParams);applyCaptions();rebuild();if(typeof draw==='function')draw();}
 window.applyParams=applyParams;
@@ -304,6 +294,10 @@ window.setZoom=k=>{zoomK=k;layout();};
 if(BOX)document.body.classList.add('box');
 if(EXPORT||EMBED)document.body.classList.add('export');
 if(DECK)document.documentElement.classList.add('deck');   // [기능마다] 발표 모드
+// 페이지 바탕은 daisyUI 색 클래스로 정한다: 기본 보기(편집) base-300, ?box=1 base-100(둥근 무대 rounded-box), 그 밖(발표 모드, 내보내기) base-200
+const PAGE_BG=(EXPORT||EMBED||DECK)?'bg-base-200':BOX?'bg-base-100':'bg-base-300';
+[document.documentElement,document.body].forEach(e=>e.classList.add(PAGE_BG));
+if(BOX)$('wrap').classList.add('rounded-box');
 addEventListener('resize',layout);layout();
 function draw(){render(now);$('scrub').value=Math.round(now/DURATION*1000);$('tm').textContent=now.toFixed(2)+' s';
   if(window.presentUI)presentUI();}   // [기능마다] 발표 모드: 진행 표시, 이전 버튼
@@ -316,7 +310,9 @@ addEventListener('keydown',e=>{if(EMBED||DECK)return;   // [기능마다] 발표
   if(e.code==='Space'){playing=!playing;e.preventDefault();}
   if(e.code==='ArrowRight'||e.code==='ArrowLeft'){playing=false;const s=(e.shiftKey?1:1/30)*(e.code==='ArrowRight'?1:-1);seek(((now+s)%DURATION+DURATION)%DURATION);e.preventDefault();}});
 const IMGS=[...Object.values(IMG).map(([u])=>u)];
-window.ready=Promise.all([loadParams(),...IMGS.map(u=>{const i=new Image();i.src=u;return i.decode();}),
+// daisyUI CSS 와 ui.css(head 의 link)를 못 불러왔으면 실패한다(스타일 없는 맨 글자 프레임을 저장하지 않게)
+const cssReady=()=>{const bad=[...document.querySelectorAll('link[rel=stylesheet]')].filter(l=>!l.sheet).map(l=>l.href);return bad.length?Promise.reject(new Error('CSS 를 불러오지 못함: '+bad.join(' '))):Promise.resolve();};
+window.ready=Promise.all([loadParams(),cssReady(),...IMGS.map(u=>{const i=new Image();i.src=u;return i.decode();}),
   document.fonts.load('400 15px "Pretendard Variable"','가나 ab'),document.fonts.load('700 15px "Pretendard Variable"','가나 ab'),document.fonts.ready,
 ]).then(r=>{window.paramsSource=r[0];measure();rebuild();draw();if(!EXPORT&&!EMBED)requestAnimationFrame(loop);});
 draw();
@@ -361,7 +357,7 @@ window.presentUI=()=>{if(!DECK)return;
   if($('progN').textContent!==txt)$('progN').textContent=txt;
   $('prev').disabled=k<1;};
 if(DECK){
-  $('stage').addEventListener('click',e=>{if(e.target.closest('#prev,#autoLbl'))return;advance();});
+  $('stage').addEventListener('click',e=>{if(e.target.closest('#prevBox,#autoLbl'))return;advance();});
   $('prev').addEventListener('click',()=>{back();$('prev').blur();});
   $('auto').checked=autoOn;
   $('auto').addEventListener('change',()=>{autoOn=$('auto').checked;draw();});

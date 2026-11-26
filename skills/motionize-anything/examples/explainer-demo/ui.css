@@ -1,17 +1,13 @@
-/* 설명 모션의 daisyUI 5 테마. 화면 조각(kit.ui)이 shadow root 안에서 daisyUI CSS(버전 고정 CDN) 바로 뒤에 불러온다.
-   shadow root 안에서는 :root 가 맞지 않아서 kit.ui 가 만드는 래퍼(.kw)에 data-theme="motionize" 를 붙여 적용한다.
-   색은 kit.W(scenes/kit.js)와 같은 값이다. 바꿀 때는 둘을 함께 바꾼다. */
-
-/* daisyUI 가 기대하는 Tailwind 기본 스타일 중 필요한 것만(daisyUI 레이어보다 낮은 base 레이어) */
-@layer base {
-  [data-theme="motionize"] *, [data-theme="motionize"] *::before, [data-theme="motionize"] *::after { box-sizing: border-box; }
-  [data-theme="motionize"] :is(button, input, textarea) { font: inherit; color: inherit; letter-spacing: inherit; }
-}
+/* motionize 의 daisyUI 5 테마. 색은 이 파일의 테마(data-theme="motionize") 하나에서만 정한다.
+   모든 모션(설명 모션, 사용법 모션, 시작 틀과 예시)의 index.html 이 <html data-theme="motionize"> 로 적용하고,
+   daisyUI CSS(버전 고정 CDN) 바로 뒤에 불러온다. 같은 이름 파일은 네 폴더가 내용이 같다. */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 
 [data-theme="motionize"] {
   color-scheme: light;
   font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
-  color: var(--color-base-content);
+  line-height: 1.5;
+  /* 팔레트: 바탕 흰색과 옅은 회색, 기본 검정, 정보 파랑, 성공 초록, 경고 주황과 호박, 오류 빨강 */
   --color-base-100: #FFFFFF;
   --color-base-200: #F1F5F9;
   --color-base-300: #E2E8F0;
@@ -40,40 +36,50 @@
   --border: 1px;
   --depth: 0;
   --noise: 0;
-  --root-bg: transparent;   /* data-theme 래퍼가 장면 위에 흰 바탕을 깔지 않게 */
-  /* daisyUI 변수에 없는 값: 진한 테두리, 알림과 배지의 옅은 배경과 테두리 */
+  --root-bg: var(--color-base-200);   /* 페이지와 무대 바탕 */
+  /* 설명 모션 초점 색: 채움(-bg), 테두리(이름만), 채움 밖 글자(-text). blue 흐름과 단위, green 마침과 반영, yellow 남음과 주의 */
+  --color-focus-blue-bg: #CFE4F8;
+  --color-focus-blue: #7EB3E3;
+  --color-focus-blue-text: #2D6CB0;
+  --color-focus-green-bg: #D3EEDB;
+  --color-focus-green: #7DC495;
+  --color-focus-green-text: #2E7A4C;
+  --color-focus-yellow-bg: #FBE8AE;
+  --color-focus-yellow: #E2B94F;
+  --color-focus-yellow-text: #8A6914;
+  /* 자막 하이라이트 */
+  --color-mark-blue: #D6E8FA;
+  --color-mark-green: #D5EFDD;
+  --color-mark-yellow: #FBEAB5;
+  /* 진한 테두리, 점선 테두리, 조각 카드의 노랑 띠 */
   --color-strong: #CBD5E1;
-  --color-info-soft: #EFF6FF;
-  --color-info-line: #BFDBFE;
-  --color-success-soft: #F0FDF4;
-  --color-success-line: #BBF7D0;
-  --color-warning-soft: #FFFBEB;
-  --color-warning-line: #FDE68A;
-  --color-error-soft: #FEF2F2;
-  --color-error-line: #FECACA;
-  /* card-body 안쪽 여백과 card-title 글자 크기 */
-  --card-p: 16px 20px;
-  --cardtitle-fs: 1rem;
+  --color-n300: #94A3B8;
+  --color-amber: #FCD34D;
+  /* 사용법 모션: 동작 파랑, 활성 항목 옅은 파랑 배경, 문제 주황, 스낵바 바탕, 스낵바 안 동작 글자 */
+  --color-usage-blue: #1F66F1;
+  --color-usage-blue-soft: #E8F0FE;
+  --color-usage-blue-light: #97BFFA;
+  --color-issue: #B25E09;
+  --color-usage-ink: #1A1F27;
+  /* 클릭 효과: 물방울 파랑과 노란 번쩍임(커서 원) */
+  --color-click-blue: #3182F3;
+  --color-click-yellow: #EDFF00;
+  /* 사용법 모션의 터미널 그림(pages/cc/cc-best@2x.png) 위에 HTML 로 덮어 그리는 글과 칸의 색. 그림의 색과 맞춘 값이다 */
+  --color-term-bg: #002B36;
+  --color-term-fg: #839496;
+  --color-term-bold: #93A1A1;
+  --color-term-dim: #3C626B;
+  --color-term-red: #6B333C;
+  --color-term-green: #01BC5A;
+  --color-term-orange: #D77757;
+  --color-term-line: #3C5B67;
+  --color-term-bar: #363736;
+  --color-term-title-bg: #F5F2F5;
+  --color-term-title-fg: #4B484B;
 }
 
-/* 장면 배치가 쓰는 고정 크기(배너 49, 버튼 40, 라디오 20, 입력 40, 텍스트 영역 89, 배지 24 와 20)에서 daisyUI 기본값과 다른 것만 맞춘다.
-   버튼 40(btn), 라디오 20(radio-sm), 입력 40(input), 배지 24(badge)와 20(badge-sm)은 daisyUI 기본 크기를 그대로 쓴다. */
-.alert { height: 49px; padding-block: 0; padding-inline: 16px 20px; gap: 8px; font-weight: 500; line-height: 1.5; white-space: nowrap; }
-.btn { white-space: nowrap; }
-.btn-secondary { --btn-border: var(--color-strong); }
-.input, .textarea { --input-color: var(--color-strong); }
-.textarea { height: 89px; min-height: 0; resize: none; }
-.badge { padding-inline: 7px; font-size: 12px; font-weight: 600; white-space: nowrap; }
-.badge-sm { padding-inline: 5px; font-size: 11px; }
-.card { background-color: var(--color-base-100); }
-.card-border { border-color: var(--color-base-300); }
-.card-body { gap: 12px; }
-.card-title { font-weight: 700; line-height: 1.4; }
+/* 배치용: Tailwind 기본 스타일(preflight)이 없어서 daisyUI 컴포넌트가 기대하는 상자 크기 계산 하나만 맞춘다 */
+[data-theme="motionize"] *, [data-theme="motionize"] *::before, [data-theme="motionize"] *::after { box-sizing: border-box; }
 
-/* alert-soft 와 badge-soft 의 배경과 테두리를 위 팔레트의 옅은 배경과 테두리로 맞춘다(색 클래스가 없으면 base-200 과 base-300) */
-.alert-info, .badge-info { --tone-bg: var(--color-info-soft); --tone-bd: var(--color-info-line); }
-.alert-success, .badge-success { --tone-bg: var(--color-success-soft); --tone-bd: var(--color-success-line); }
-.alert-warning, .badge-warning { --tone-bg: var(--color-warning-soft); --tone-bd: var(--color-warning-line); }
-.alert-error, .badge-error { --tone-bg: var(--color-error-soft); --tone-bd: var(--color-error-line); }
-.alert-soft { background-color: var(--tone-bg, var(--color-base-200)); border-color: var(--tone-bd, var(--color-base-300)); }
-.badge-soft { background-color: var(--tone-bg, var(--color-base-200)); border-color: var(--tone-bg, var(--color-base-200)); }
+/* 배치용: 같은 t 면 같은 그림이어야 해서 kit.ui 마크업(.kw) 안의 CSS 애니메이션과 transition 을 끈다(daisyUI skeleton 의 반짝임 등) */
+[data-theme="motionize"] .kw *, [data-theme="motionize"] .kw *::before, [data-theme="motionize"] .kw *::after { animation: none !important; transition: none !important; }

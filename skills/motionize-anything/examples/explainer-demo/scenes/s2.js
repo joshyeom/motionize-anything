@@ -1,5 +1,5 @@
 // 장면 2 하는 일: 첫 컷은 박스 3개 흐름(문서 변경은 회색 윤곽, 색인과 검색 화면이 차례로 파랑 채움이 초점). 둘째 컷은 흐름이 사라지고 화면 2장(파랑 테두리 초점)과 보고서 박스(파랑 채움)가 나타난다.
-// 그림 출처: codex 로 만든 assets/s2-screen.png. 직접 그린 것: 박스, 화살표, 이름표, 테두리, 텍스트. 화면 글은 모두 TEXT 에 있다.
+// 그림 출처: codex 로 만든 assets/s2-screen.png. daisyUI 로 그린 것: 박스(kit.tile = alert), 테두리(초점 색 outline), 이름표(kit.text), 화살표(kit.arrow, text-* 색). 화면 글은 모두 TEXT 에 있다.
 (function () {
   const TEXT = {
     sentence1: '문서가 바뀌면 에이전트가 색인과 검색 화면을 차례로 고칩니다',
@@ -9,29 +9,29 @@
     report: '보고서',
   };
   const BW = 440, BH = 220, BG = 120, BX = (1920 - (3 * BW + 2 * BG)) / 2, BY = 600;
-  const IMG = { x: 140, y: 190, w: 900, h: 680, src: 'assets/s2-screen.png' }, EDGE = 6;
+  const IMG = { x: 140, y: 190, w: 900, h: 680, src: 'assets/s2-screen.png' };
   const REP = { x: 1260, y: 400, w: 440, h: 220 };
   let sent1, sent2, boxes = [], arrows = [], img, frame, tags = [], report, repArrow, ready = false;
 
   MotionScenes.register(2, {
     build(root, kit) {
-      const W = kit.W, F = kit.FOCUS.blue;
       TEXT.flow.forEach((t, i) => {
         const x = BX + i * (BW + BG);
         // 꺼진 상태(회색 윤곽) 위에 켜진 상태(파랑 채움)를 겹쳐 둔다
-        const off = kit.box(root, { x, y: BY, w: BW, h: BH, radius: 24, bg: W.white, border: `3px solid ${W.strong}`, text: t, size: 48, weight: 800, color: W.subtle, align: 'center' });
-        boxes.push({ off, on: i ? kit.box(off, { x: 0, y: 0, w: BW, h: BH, radius: 24, bg: F.bg, border: `4px solid ${F.edge}`, text: t, size: 48, weight: 800, color: F.ink, align: 'center' }) : null });
-        if (i) arrows.push(kit.arrow(root, { x1: x - BG + 10, y1: BY + BH / 2, x2: x - 10, y2: BY + BH / 2, color: W.subtle, width: 5, head: 16 }));
+        const off = kit.tile(root, { x, y: BY, w: BW, h: BH, size: 48, text: t, base: true, muted: true });
+        boxes.push({ off, on: i ? kit.tile(off, { x: 0, y: 0, w: BW, h: BH, size: 48, text: t, tone: 'blue' }) : null });
+        if (i) arrows.push(kit.arrow(root, { x1: x - BG + 10, y1: BY + BH / 2, x2: x - 10, y2: BY + BH / 2, tone: 'neutral', width: 5, head: 16 }));
       });
       img = kit.img(root, Object.assign({ card: false }, IMG));
-      frame = kit.box(root, { x: IMG.x - 10, y: IMG.y - 10, w: IMG.w + 20, h: IMG.h + 20, radius: 28, border: `${EDGE}px solid ${F.edge}` });
-      TEXT.tags.forEach((t, i) => tags.push(kit.box(root, { x: IMG.x + IMG.w * (i ? 0.75 : 0.25) - 150, y: IMG.y - 56, w: 300, h: 44, text: t, size: 36, weight: 700, color: W.subtle, align: 'center' })));
-      report = kit.box(root, { ...REP, radius: 24, bg: F.bg, border: `4px solid ${F.edge}`, text: TEXT.report, size: 48, weight: 800, color: F.ink, align: 'center' });
-      repArrow = kit.arrow(root, { x1: IMG.x + IMG.w + 30, y1: REP.y + REP.h / 2, x2: REP.x - 20, y2: REP.y + REP.h / 2, color: F.edge, width: 5, head: 16 });
+      frame = kit.tile(root, { x: IMG.x - 10, y: IMG.y - 10, w: IMG.w + 20, h: IMG.h + 20, s: 6, tone: 'blue', variant: 'outline' });
+      TEXT.tags.forEach((t, i) => tags.push(kit.text(root, { cx: IMG.x + IMG.w * (i ? 0.75 : 0.25), y: IMG.y - 56, size: 36, tone: 'neutral', text: t })));
+      report = kit.tile(root, { ...REP, size: 48, text: TEXT.report, tone: 'blue' });
+      repArrow = kit.arrow(root, { x1: IMG.x + IMG.w + 30, y1: REP.y + REP.h / 2, x2: REP.x - 20, y2: REP.y + REP.h / 2, tone: 'blue', width: 5, head: 16 });
       sent1 = kit.sentence(root, TEXT.sentence1, 1, [['차례로 고칩니다', 'blue']]);
       sent2 = kit.sentence(root, TEXT.sentence2, 2, [['비교해 차이를 보고합니다', 'blue']]);
     },
     measure(kit) {
+      tags.forEach(t => t.fit());
       kit.fitSentence(sent1); kit.fitSentence(sent2);
       ready = true;
     },

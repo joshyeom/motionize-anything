@@ -38,14 +38,14 @@
 
 | 구역 | 구분 | 내용 |
 |------|------|------|
-| 무대, 보기 방식, 칩, 클릭 효과, 커서 CSS | 공용 | `#wrap` `#stage` `.chip` `#fx` `#cursor` |
-| 화면 배치 CSS | 기능마다 | `#win` `#app` `#ccWin` `#cc` `.term` `.pt`(제품 화면 글꼴, 색) 등 |
-| 장면 문장과 문제 박스 CSS | 기능마다(값은 그대로) | `.sent.l1` `.sent.l2`(kit.SENT 자리), `.issue`(주황 문제 박스) |
-| 발표 모드 CSS | 기능마다(그대로 복사) | `html.deck`, `#prev`, `#autoLbl`, `#prog` |
+| 무대, 보기 방식, 클릭 효과, 커서의 배치용 규칙 | 공용 | `#wrap` `#stage` `#fx` `#cursor` `.dot` |
+| 화면 배치용 규칙 | 기능마다 | `#win`(mockup-window) `#app` `#ccWin` `#cc` `#ccTerm`(mockup-code) 등. 스타일은 daisyUI 클래스가 맡는다 |
+| 장면 문장과 문제 박스 | 기능마다(값은 그대로) | `.sent`(자리 x 120, y 114 와 166, 글자 크기는 `zoom`), `.issue`(daisyUI `alert-warning` 문제 박스) |
+| 발표 모드 배치용 규칙 | 기능마다(그대로 복사) | `html.deck`, `#prevBox`(daisyUI `btn`), `#autoLbl`(`checkbox`), `#progBox`(`badge`) |
 | 무대 안 화면 요소 | 기능마다 | 앱 창, 터미널 창, 알림 카드와 그 안의 덮개 요소 |
 | 효과 층 | 공용 | 순서를 지킨다: 효과 → 문구 → 커서 |
-| 칩 DOM | 공용 구조 | `#cap<n>` = `<b>번호</b><span class="role">…</span><span class="ttl">…</span>` |
-| 데이터 상수 | 기능마다 | `IMG` `APP`(창 배율 1.0, x 320, y 240) `CC` `R`(rects.json에서 옮김) `ISS`(문제 박스 글, 테두리 대상, 위치) 등 |
+| 칩 DOM | 공용 구조 | `#cap<n>` 안의 daisyUI `badge`: 번호 `.num`, 역할 `.role`, 제목 `.ttl` |
+| 데이터 상수 | 기능마다 | `IMG` `APP`(앱 화면 x 320, y 288, 배율 `s`) `CC` `R`(HTML 화면은 `measureApp` 이 DOM 에서 재고, 캡처 화면은 rects.json 에서 옮김) `ISS`(문제 박스 글, 테두리 대상, 위치 또는 위치를 돌려주는 함수) 등 |
 | 수학, 도구 | 공용 | `seg` `ioC` `bez` `patch` `full` `show` |
 | 배치, 좌표 | 기능마다 | `aBox` `page()` `cardState()` `appWin()` `ccWin()` |
 | `rebuild()` | 틀 공용, 목록 기능마다 | 클릭 `TG` `RAD` `PT`, 강조 `rings`, 커서 이동 `MV` |
@@ -89,7 +89,7 @@
 
 ## 문구(칩)
 
-- `CAPTIONS[n] = {num, role, title, kind: 'chip'}`. role 은 역할(회색 600), title 은 질문(검정 800)이다. 예: `{num: '2', role: '요청 보내기', title: '동료에게 어떻게 요청하나요'}`. `CAPTION_OF`(장면 → 문구 묶음), `CAPTION_SCENES`(그 반대), `ELEMENTS`(`cap<n>.title`).
+- `CAPTIONS[n] = {num, role, title, kind: 'chip'}`. role 은 역할(`text-neutral` 회색), title 은 질문(굵게)이다. 예: `{num: '2', role: '요청 보내기', title: '동료에게 어떻게 요청하나요'}`. `CAPTION_OF`(장면 → 문구 묶음), `CAPTION_SCENES`(그 반대), `ELEMENTS`(`cap<n>.title`).
 - `applyCaptions` 가 `P.scenes[n]` 의 role, title(비면 `CAPTIONS` 값)을 칩에 쓴다. 칩 글은 한 줄이고 폭 760px 안이다.
 - `captionTimes(T)` → 묶음마다 `{tin, tout, reenter?}`(기준 초). `tin` −1 은 처음부터 보임. 끝에서 `reenter` 로 다시 나타나 첫 화면과 이어진다.
 - `CAP_GAP`(0.32초): 다음 칩은 앞 칩이 다 사라진 뒤 나타난다(같은 자리라 겹치지 않게). 창 바꾸기 장면은 `max(CAP_GAP, inDelay/1000)` 만큼 늦춘다.
@@ -103,7 +103,7 @@
 - 두 캡처를 겹쳐 페이드하지 않는다(글자가 이중으로 보인다).
 - 상태가 바뀐 카드는 원래 그림 위에 같은 클래스 구조로 다시 그린다. 카드 높이는 `measure()` 가 잰 값으로 정하고, 그 아래 카드는 그림을 잘라 내려 붙인다(`patch`).
 - 긴 그림 스크롤: `patch` 로 긴 그림의 scrollY 구간을 보이고, 위 머리줄은 따로 고정한다. 끝 프레임이 뷰포트 캡처와 같음을 확인한 뒤 그 캡처로 바꾼다.
-- 터미널: 그림(`cc-best@2x.png`)의 원래 경로, 아래 줄을 같은 글꼴(Menlo 30px, 줄 높이 38px)로 덮어 그려 잉크 양 1.0 안팎, 위치 1~2px 안으로 맞춘 뒤 글만 바꾼다. 색은 demo.gif 실측이다. 한글은 시스템 대체 글꼴이라 칸 폭이 조금 다르다. 붙여 넣기는 `[Pasted text #1 +N lines]` 한 덩어리로 그리고 N은 보낼 글의 줄바꿈 수다. 응답 줄 위치는 `CC_ROWS`(줄 사이 38 그림 px)로 계산한다.
+- 터미널: 그림(`cc-best@2x.png`)의 원래 경로, 아래 줄을 daisyUI `mockup-code`(`#ccTerm`, 고정폭 14px 를 30px 로 키움)로 덮어 그려 위치를 1~2px 안으로 맞춘 뒤 글만 바꾼다. 색은 demo.gif 실측값을 테마 변수(`--color-term-*`)로 두고 `#ccTerm` 에서 daisyUI 색 이름(`neutral`, `success` 등)에 연결해 쓴다. 한글은 시스템 대체 글꼴이라 칸 폭이 조금 다르다. 붙여 넣기는 `[Pasted text #1 +N lines]` 한 덩어리로 그리고 N은 보낼 글의 줄바꿈 수다. 응답 줄 위치는 `CC_ROWS`(줄 사이 38 그림 px)로 계산한다.
 - 창 바꾸기 슬라이드: 나가는 창 0.4초 → 들어오는 창 0.45초, 160px 이동 + 불투명도. `inDelay ≥ out` 이라 두 창이 겹치지 않는다.
 - 알림 카드는 창 밖 무대 위에 두고 오른쪽에서 48px 미끄러져 들어오게 한다.
 - 글꼴 굵기는 잉크 양을 비교해 정한다(`.pt` 의 글꼴 굵기).

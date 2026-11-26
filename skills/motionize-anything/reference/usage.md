@@ -34,18 +34,18 @@
 6. **장면 칩은 역할, 질문 형태다.** 번호, 역할(`CAPTIONS[n].role`), 질문(`CAPTIONS[n].title`)을 한 줄로 쓰고 폭 760px 안에 둔다(`window.captionOverflow(n)` 로 확인).
    - 예: 1, 메모 만들기, 새 메모는 어떻게 만드나요.
 7. **장면마다 설명 문장 2개.** 칩 아래에 위 문장과 아래 문장(`SENTENCES[n]`)이 차례로 나타나고, 문장마다 멈춘다.
-   - 자리는 x 120, 위 문장 y 114~162(40px 700), 아래 문장 y 166~210(34px 600).
+   - 자리는 x 120, 위 문장 y 114~162(글자 40px 굵게), 아래 문장 y 166~210(글자 34px)이다. 글자 크기는 `zoom` 배율로 정한다.
    - 문장 하나는 한 줄이고 폭 1680px 안이다. 사용자가 할 동작과 그 결과를 쓴다.
    - 단계 표에는 장면 처음에 `s<n>_sent1`(0.3초 나타남), `s<n>_read1`(읽기 정지), `s<n>_sent2`, `s<n>_read2` 를 둔다. 문장은 다음 장면으로 넘어갈 때 칩과 함께 사라진다.
-8. **구도 기본값(예시 기준).** 무대 1920×1080, 바탕 연회색 rgb(242,244,246).
+8. **구도 기본값(예시 기준).** 무대 1920×1080, 바탕은 daisyUI `base-200`(옅은 회색)이다.
    - 위에서 아래로 칩(y 17~73), 문장 자리(y 114~210), 앱 창(y 240~1060)을 둔다. 서로 겹치지 않는다.
-   - 앱 창 배율은 1.0이다. 1280×820 CSS 앱 화면을 x 320~1600, y 240~1060 에 그린다. 그래서 캡처 뷰포트를 1280×820 으로 맞춘다(`capture.md`).
+   - 앱 창은 daisyUI `mockup-window` 1280×820 이고 x 320~1600, y 240~1060 에 놓는다. 위 48px 는 창 막대(점 3개)이고 앱 화면은 그 아래 1280×772(x 320~1600, y 288~1060)에 그린다. HTML 로 그리는 앱 화면은 daisyUI 기본 크기의 1.25배(`zoom`, `APP.s` 1.25)로 키워 읽히게 하고, 캡처 그림을 쓰면 `APP.s` 는 1이고 캡처 뷰포트를 1280×772 으로 맞춘다(`capture.md`).
    - 터미널 창은 같은 폭 1280 에 맞춰 `cc-best@2x.png` 를 1280/1460배로 그린다.
    - 브라우저 창에서는 무대를 창에 맞춰 줄이고 가운데에 둔다. `layout()` 의 marginTop 은 남는 높이의 절반(`(innerHeight-1080*k)/2`)이다. 남는 높이를 위쪽에 모두 주면 무대가 창 아래에 붙는다.
 9. **문제와 강조 박스.**
    - 사용 흐름을 보여 주는 강조는 대상 둘레 파란 테두리(ring 단계)만 쓴다.
    - 문제 지점은 ring 단계(id 에 `_issue`)로 두고, 관련 요소에 주황 테두리를 그리며 문제 박스를 띄운다.
-   - 문제 박스는 주황 글자 #b25e09, 주황 배경 #fdf3e7, 왼쪽에 문제 라벨을 붙이고 글은 한 줄로 쓴다(`index.html` 의 `.issue`, `ISS`).
+   - 문제 박스는 daisyUI `alert alert-warning alert-soft`(주황, 옅은 배경)이고 왼쪽에 `badge badge-warning` 문제 라벨을 붙이며 글은 한 줄로 쓴다(`index.html` 의 `.issue`, `ISS`). 사용법 모션은 `#stage` 에서 `--color-warning` 을 테마의 `--color-issue`(주황 `b25e09`)로, `--color-info` 를 `--color-usage-blue`(동작 파랑)로 연결한다. 강조 선(`text-warning`, `text-info`)과 버튼, 칩 번호 원이 이 색을 따른다.
    - 박스는 앱 창 안에 두고 칩, 문장, 강조한 요소를 가리지 않게 위치(`ISS[id].box`)를 정한다.
    - 박스 유지 시간은 1.6초 이상으로 해 멈춤이 생기게 한다(예시는 2.75초 이상).
 10. **에이전트에게 맡기는 단계.** Claude Code 터미널 그림 위에 붙여 넣기, 입력, Enter, 응답 줄을 그린다.
@@ -58,13 +58,17 @@
 12. **실제와 다르게 그린 곳은 모두 README 의 "뺀 것, 실제와 다른 점" 절에 적는다.**
 13. **보여 줄 때는 로컬 서버 주소를 브라우저로 연다.** `python3 -m http.server --bind 127.0.0.1` 로 띄운다. `file://` 은 fetch가 막혀 안 된다.
 14. **엔진(index.html, motion-steps.js) 작업을 위임할 때는 모델을 Opus로 지정한다.**
+15. **화면 스타일은 daisyUI 로만 정한다.** 가짜 앱 화면, 칩, 문제 박스, 조작 버튼, 터미널 덮개까지 모든 화면 요소는 daisyUI 5 컴포넌트 클래스(`navbar`, `menu`, `list`, `btn`, `input`, `textarea`, `alert`, `badge`, `mockup-window`, `mockup-code` 등)로 그린다.
+    - 색은 `ui.css` 의 daisyUI 테마(`data-theme="motionize"`) 한 곳에서만 정한다. `index.html` 에 hex 나 rgb 색 값을 쓰지 않고 색 클래스(`text-info`, `bg-base-100`)나 `var(--color-*)` 로 쓴다.
+    - `index.html` 의 `<style>` 과 인라인 `style` 에는 배치용 값(위치, 크기, `zoom` 배율, `flex`, `gap`)만 둔다. 직접 만든 CSS 를 새로 쓰지 않는다.
+    - 그림 파일(캡처 PNG)은 그림이라 그대로 두고, 그 위에 덮는 HTML 만 daisyUI 로 그린다. 터미널 덮개의 색은 그림의 색에 맞춘 테마 변수(`--color-term-*`)를 쓴다.
 
 ## 진행 순서 (단계마다 사용자 확인 후 다음으로)
 
 | 단계 | 할 일 | 끝났다고 볼 기준 |
 |------|-------|------------------|
 | 1. 장면표 | 장면 4~6개로 나누고 장면마다 칩(역할, 질문), 설명 문장 2개, 캡처할 페이지 상태, 클릭과 입력 순서, 문제 박스 글을 표로 적는다. | 사용자가 장면표를 승인 |
-| 2. 캡처 | `capture.md` 대로 Aside로 찍는다. 뷰포트 1280×820, PNG는 2배, 사각형과 스타일은 `rects.json`, 설명은 `notes.md`. | PNG를 모두 눈으로 확인, 클릭 대상과 입력 필드, 스크롤 영역, 실측 스타일이 rects.json에 있음, 민감한 글 없음 |
+| 2. 캡처 | `capture.md` 대로 Aside로 찍는다. 뷰포트 1280×772, PNG는 2배, 사각형과 스타일은 `rects.json`, 설명은 `notes.md`. | PNG를 모두 눈으로 확인, 클릭 대상과 입력 필드, 스크롤 영역, 실측 스타일이 rects.json에 있음, 민감한 글 없음 |
 | 3. 단계 표 | `motion-steps.js` 의 `[기능마다]` 를 채운다(`STEPS_SRC`, `TXT`, `CAPTIONS`, `SENTENCES`, `captionTimes`). | `compute` 로 단계 수와 전체 길이 확인, 읽는 멈춤 1.6초 이상 |
 | 4. 엔진 | `index.html` 의 `[기능마다]` 를 채운다(`engine.md`). | 발표 모드로 처음부터 끝까지 클릭해 넘기며 멈춤마다 봄, `window.stops().length` 가 장면표의 멈춤 수와 같음, 콘솔 오류 없음 |
 | 5. 기준 프레임 | `baseline.mjs` 로 프레임을 저장해 둔다(`qa.md`). | 기준 폴더가 생김 |
@@ -90,10 +94,10 @@ mkdir -p $NEW/pages/cc && cp $SK/engine/usage/pages/cc/cc-best@2x.png $NEW/pages
 - 장면 3개짜리 완성 예시 `examples/usage-demo/` 는 클릭, 입력, 창 바꾸기, 문제 박스, 터미널 단계를 모두 쓴다. 필요한 부분을 거기서 복사해 시작 틀에 붙인다.
 - 바꿀 곳은 `[기능마다]` 표시가 붙은 부분이다.
   - `motion-steps.js`: `FEATURE_ID`, `TXT`, `SCENES`, `STEPS_SRC`, `REPLY_LINES`, `CAPTIONS`, `SENTENCES`, `CAPTION_OF`, `CAPTION_SCENES`, `ELEMENTS`, `featureT`, `captionTimes`.
-  - `index.html`: 화면 배치 CSS, 무대 안 화면 요소, `#cap<n>` 칩, `IMG`, `APP`, `CC`, `R`, `ISS` 상수, `page()`, `rebuild()` 안 클릭과 강조, 커서 목록, `measure()`, `render` 의 `[기능마다] 화면`.
+  - `index.html`: 화면 배치용 규칙, 무대 안 화면 요소(daisyUI 마크업), `#cap<n>` 칩, `IMG`, `APP`, `CC`, `R`, `ISS` 상수, `page()`, `rebuild()` 안 클릭과 강조, 커서 목록, `measure()`, `render` 의 `[기능마다] 화면`.
   - 발표 모드 절(`stops`, `advance`, `back`, `presentUI`)과 `layout()` 은 그대로 쓴다. 멈춤 규칙은 단계 id(`_read1`, `_read2`)와 ring 유지 시간으로 정해진다.
 - 캡처 장면 스크립트(`s1.js` 같은 파일)는 제품에 맞게 새로 쓴다. 쓰는 모양은 `capture.md` 에 있다.
-- 복사한 캡처 도구는 1440×900 뷰포트를 가정한다. 1280×820 으로 고치는 곳은 `capture.md` 준비 절에 있다.
+- 복사한 캡처 도구는 1440×900 뷰포트를 가정한다. 1280×772 으로 고치는 곳은 `capture.md` 준비 절에 있다.
 - 캡처 PNG 없이 HTML 로 그린 가짜 화면을 쓰는 모션이면 `IMG` 를 비우고 `capture/` 는 복사하지 않는다.
 
 ## Playwright 준비 (기준 프레임, mp4, 확인 도구)
